@@ -9,7 +9,7 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.html$/, loader: "raw" },
-            { test: /\.rgl$/, loader: path.join(__dirname, 'rgl.js') },
+            { test: /\.rgl$/, loader: 'rgl' },
             { test: /\.js$/, loader: 'babel?cacheDirectory'}
         ]
 
