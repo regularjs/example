@@ -1,0 +1,16 @@
+{
+  "name": "webpack-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "leeluolee",
+  "license": "MIT",
+  "devDependencies": {
+    "raw-loader": "^0.5.1",
+    "rgl-loader": "^0.4.0",
+    "regularjs": "^0.4.0"
+  }
+}

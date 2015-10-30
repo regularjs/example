@@ -1,0 +1,15 @@
+
+<h2> {title} </h2>
+<form action="">
+  <div class="form-control">
+    <label for="">User:{user}</label> 
+    <input type="text" r-model={user}>
+  </div>
+  <div class="form-control">
+    <label for="">Password</label>
+    <input type="password">
+  </div>
+  <div class="form-control">
+    <button>Login</button>
+  </div>
+</form>
