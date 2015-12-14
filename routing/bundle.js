@@ -1,41 +1,41 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -45,70 +45,1204 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _loginAmdJs = __webpack_require__(1);
-
-	var _loginBabelJs = __webpack_require__(32);
-
-	var _loginCommonjsJs = __webpack_require__(34);
-
-	var _regularjs = __webpack_require__(3);
-
+	
+	var _regularState = __webpack_require__(1);
+	
+	var _regularState2 = _interopRequireDefault(_regularState);
+	
+	var _regularjs = __webpack_require__(8);
+	
 	var _regularjs2 = _interopRequireDefault(_regularjs);
-
-	// we use es2015 template-string to hold template .
-	new _regularjs2['default']({
-	  template: '\n    <login-amd title=\'Login AMD\' />\n    <login-babel title=\'Login Babel\' />\n    <login-common title=\'Login Common\' />\n  '
-	}).$inject('#app');
+	
+	var _moduleAppJs = __webpack_require__(37);
+	
+	var _moduleAppJs2 = _interopRequireDefault(_moduleAppJs);
+	
+	var _moduleBlogJs = __webpack_require__(40);
+	
+	var _moduleBlogJs2 = _interopRequireDefault(_moduleBlogJs);
+	
+	var _moduleChatJs = __webpack_require__(41);
+	
+	var _moduleChatJs2 = _interopRequireDefault(_moduleChatJs);
+	
+	// if the module only perform as a layout, you can pass raw template
+	
+	var _moduleIndexHtml = __webpack_require__(42);
+	
+	var _moduleIndexHtml2 = _interopRequireDefault(_moduleIndexHtml);
+	
+	var _moduleUserJs = __webpack_require__(43);
+	
+	var _moduleUserJs2 = _interopRequireDefault(_moduleUserJs);
+	
+	var _moduleBlogDetailJs = __webpack_require__(44);
+	
+	var _moduleBlogDetailJs2 = _interopRequireDefault(_moduleBlogDetailJs);
+	
+	var _moduleBlogListJs = __webpack_require__(48);
+	
+	var _moduleBlogListJs2 = _interopRequireDefault(_moduleBlogListJs);
+	
+	var _moduleBlogEditJs = __webpack_require__(50);
+	
+	var _moduleBlogEditJs2 = _interopRequireDefault(_moduleBlogEditJs);
+	
+	var _utilFilterJs = __webpack_require__(51);
+	
+	var _utilFilterJs2 = _interopRequireDefault(_utilFilterJs);
+	
+	var dom = _regularjs2['default'].dom;
+	
+	_regularjs2['default'].filter(_utilFilterJs2['default']).directive({}).event({
+	  'enter': function enter(elem, fire) {
+	    function update(ev) {
+	      if (ev.which === 13) {
+	        ev.preventDefault();
+	        fire(ev);
+	      }
+	    }
+	    dom.on(elem, "keypress", update);
+	
+	    return function () {
+	      dom.off(elem, "keypress", update);
+	    };
+	  }
+	});
+	
+	// Start Stateman.
+	
+	var stateman = (0, _regularState2['default'])({
+	  view: document.getElementById("#app"),
+	  Component: _regularjs2['default']
+	});
+	
+	// store infomation in local storage
+	try {
+	
+	  var username = localStorage.getItem("username");
+	
+	  if (username) stateman.user = { name: username, id: -1 };
+	} catch (e) {}
+	
+	stateman
+	// application core
+	.state("app", _moduleAppJs2['default'], "")
+	
+	// home page
+	.state("app.index", _moduleIndexHtml2['default'], { url: "" }) // equal to ""
+	
+	// blog
+	.state("app.blog", _moduleBlogJs2['default']).state("app.blog.detail", _moduleBlogDetailJs2['default'], { url: ":id/detail" }).state("app.blog.list", _moduleBlogListJs2['default'], "").state("app.blog.edit", _moduleBlogEditJs2['default'], ":id/edit")
+	
+	//chat
+	.state("app.chat", _moduleChatJs2['default'])
+	
+	// user
+	.state("app.user", _moduleUserJs2['default'], "user/:uid")
+	
+	// redirect when notfound
+	.on("notfound", function () {
+	  this.go("app.index", { replace: true });
+	})
+	
+	// authen, need login first
+	.on("begin", function (option) {
+	  if (option.current.name !== "app.index" && !this.user) {
+	    option.stop();
+	    alert("You need Login first");
+	    this.go("app.index", { replace: true });
+	  }
+	})
+	
+	// start the application
+	.start({ html5: true, root: '/', prefix: '!' });
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports) {
-
-	  var tpl = __webpack_require__(2);
-	  var Regular = __webpack_require__(3);
-
-	  exports.LoginAMD = Regular.extend({
-	    name: 'login-amd',
-	    template: tpl
-	  });
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+	
+	(function (root, factory) {
+	  if (true) {
+	    // AMD. Register as an anonymous module.
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	  } else if (typeof exports === 'object') {
+	    // Node. Does not work with strict CommonJS, but
+	    // only CommonJS-like environments that support module.exports,
+	    // like Node.
+	    module.exports = factory(require('stateman'));
+	  } else {
+	    // Browser globals (root is window)
+	    root.restate = factory(root.StateMan);
+	  }
+	})(undefined, function (StateMan) {
+	
+	  var _ = StateMan.util;
+	
+	  var restate = function restate(option) {
+	    option = option || {};
+	    var stateman = option.stateman || new StateMan(option);
+	    var preStae = stateman.state;
+	    var BaseComponent = option.Component;
+	    var globalView = option.view || document.body;
+	
+	    var filters = {
+	      encode: function encode(value, param) {
+	        return stateman.history.prefix + (stateman.encode(value, param || {}) || "");
+	      }
+	    };
+	
+	    stateman.state = function (name, Component, config) {
+	
+	      if (!Component) return preStae.call(stateman, name);
+	
+	      if (BaseComponent) {
+	        // 1. regular template or parsed ast
+	        if (typeof Component === "string" || Array.isArray(Component)) {
+	          Component = BaseComponent.extend({
+	            template: Component
+	          });
+	        }
+	        // 2. it a Object, but need regularifi
+	        if (typeof Component === "object" && Component.regularify) {
+	          Component = BaseComponent.extend(Component);
+	        }
+	      }
+	
+	      // 3. duck check is a Regular Component
+	      if (Component.extend && Component.__after__) {
+	
+	        if (!Component.filter("encode")) {
+	          Component.filter(filters);
+	        }
+	        var state = {
+	          component: null,
+	          enter: function enter(step) {
+	            var data = { $param: step.param },
+	                component = this.component,
+	                noComponent = !component,
+	                view;
+	
+	            if (noComponent) {
+	              component = this.component = new Component({
+	                data: data,
+	                $state: stateman
+	              });
+	            }
+	            _.extend(component.data, data, true);
+	
+	            var parent = this.parent,
+	                view;
+	            if (parent.component) {
+	              var view = parent.component.$refs.view;
+	              if (!view) throw this.parent.name + " should have a element with [ref=view]";
+	            }
+	            component.$inject(view || globalView);
+	            var result = component.enter && component.enter(step);
+	            component.$mute(false);
+	            if (noComponent) component.$update();
+	            return result;
+	          },
+	          leave: function leave(option) {
+	            var component = this.component;
+	            if (!component) return;
+	            component.$inject(false);
+	            component.leave && component.leave(option);
+	            component.$mute(true);
+	          },
+	          update: function update(option) {
+	            var component = this.component;
+	            if (!component) return;
+	            component.update && component.update(option);
+	            component.$update({
+	              $param: option.param
+	            });
+	            component.$emit("state:update", option);
+	          }
+	        };
+	
+	        if (typeof config === "string") config = { url: config };
+	        _.extend(state, config || {});
+	
+	        preStae.call(stateman, name, state);
+	      } else {
+	        preStae.call(stateman, name, Component);
+	      }
+	      return this;
+	    };
+	    return stateman;
+	  };
+	
+	  restate.StateMan = StateMan;
+	
+	  return restate;
+	});
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports =[{"type":"element","tag":"h2","attrs":[],"children":[{"type":"text","text":" "},{"type":"expression","body":"c._sg_('title', d, e)","constant":false,"setbody":"c._ss_('title',p_,d, '=', 1)"},{"type":"text","text":" "}]},{"type":"text","text":"\n"},{"type":"element","tag":"form","attrs":[{"type":"attribute","name":"action","value":""}],"children":[{"type":"text","text":"\n  "},{"type":"element","tag":"div","attrs":[{"type":"attribute","name":"class","value":"form-control"}],"children":[{"type":"text","text":"\n    "},{"type":"element","tag":"label","attrs":[{"type":"attribute","name":"for","value":""}],"children":[{"type":"text","text":"User:"},{"type":"expression","body":"c._sg_('user', d, e)","constant":false,"setbody":"c._ss_('user',p_,d, '=', 1)"}]},{"type":"text","text":" \n    "},{"type":"element","tag":"input","attrs":[{"type":"attribute","name":"type","value":"text"},{"type":"attribute","name":"r-model","value":{"type":"expression","body":"c._sg_('user', d, e)","constant":false,"setbody":"c._ss_('user',p_,d, '=', 1)"}}]},{"type":"text","text":"\n  "}]},{"type":"text","text":"\n  "},{"type":"element","tag":"div","attrs":[{"type":"attribute","name":"class","value":"form-control"}],"children":[{"type":"text","text":"\n    "},{"type":"element","tag":"label","attrs":[{"type":"attribute","name":"for","value":""}],"children":[{"type":"text","text":"Password"}]},{"type":"text","text":"\n    "},{"type":"element","tag":"input","attrs":[{"type":"attribute","name":"type","value":"password"}]},{"type":"text","text":"\n  "}]},{"type":"text","text":"\n  "},{"type":"element","tag":"div","attrs":[{"type":"attribute","name":"class","value":"form-control"}],"children":[{"type":"text","text":"\n    "},{"type":"element","tag":"button","attrs":[],"children":[{"type":"text","text":"Login"}]},{"type":"text","text":"\n  "}]},{"type":"text","text":"\n"}]}]
+	"use strict";
+	
+	var StateMan = __webpack_require__(3);
+	StateMan.Histery = __webpack_require__(6);
+	StateMan.util = __webpack_require__(5);
+	StateMan.State = __webpack_require__(4);
+	
+	module.exports = StateMan;
 
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	
+	var State = __webpack_require__(4),
+	    Histery = __webpack_require__(6),
+	    brow = __webpack_require__(7),
+	    _ = __webpack_require__(5),
+	    baseTitle = document.title,
+	    stateFn = State.prototype.state;
+	
+	function StateMan(options) {
+	  if (this instanceof StateMan === false) {
+	    return new StateMan(options);
+	  }
+	  options = options || {};
+	  if (options.history) this.history = options.history;
+	  this._states = {};
+	  this._stashCallback = [];
+	  this.current = this.active = this;
+	  this.strict = options.strict;
+	  this.title = options.title;
+	  this.on("end", function () {
+	    var cur = this.current,
+	        title;
+	    while (cur) {
+	      title = cur.title;
+	      if (title) break;
+	      cur = cur.parent;
+	    }
+	    document.title = typeof title === "function" ? cur.title() : String(title || baseTitle);
+	  });
+	}
+	
+	_.extend(_.emitable(StateMan), {
+	  // start StateMan
+	
+	  state: function state(stateName, config) {
+	    var active = this.active;
+	    if (typeof stateName === "string" && active.name) {
+	      stateName = stateName.replace("~", active.name);
+	      if (active.parent) stateName = stateName.replace("^", active.parent.name || "");
+	    }
+	    // ^ represent current.parent
+	    // ~ represent  current
+	    // only
+	    return stateFn.apply(this, arguments);
+	  },
+	  start: function start(options) {
+	    if (!this.history) this.history = new Histery(options);
+	    if (!this.history.isStart) {
+	      this.history.on("change", _.bind(this._afterPathChange, this));
+	      this.history.start();
+	    }
+	    return this;
+	  },
+	  stop: function stop() {
+	    this.history.stop();
+	  },
+	  async: function async() {
+	    return this.active && this.active.async();
+	  },
+	  // @TODO direct go the point state
+	  go: function go(state, option, callback) {
+	    option = option || {};
+	    if (typeof state === "string") state = this.state(state);
+	
+	    if (typeof option === "function") {
+	      callback = option;
+	      option = {};
+	    }
+	
+	    if (option.encode !== false) {
+	      var url = state.encode(option.param);
+	      this.nav(url, { silent: true, replace: option.replace });
+	      this.path = url;
+	    }
+	    this._go(state, option, callback);
+	    return this;
+	  },
+	  nav: function nav(url, options, callback) {
+	    if (typeof options === "function") {
+	      callback = options;
+	      options = {};
+	    }
+	    options = options || {};
+	    // callback && (this._cb = callback)
+	
+	    this.history.nav(url, _.extend({ silent: true }, options));
+	    if (!options.silent) this._afterPathChange(_.cleanPath(url), options, callback);
+	    // this._cb = null;
+	    return this;
+	  },
+	  decode: function decode(path) {
+	    var pathAndQuery = path.split("?");
+	    var query = this._findQuery(pathAndQuery[1]);
+	    path = pathAndQuery[0];
+	    var state = this._findState(this, path);
+	    if (state) _.extend(state.param, query);
+	    return state;
+	  },
+	  encode: function encode(stateName, param) {
+	    return this.state(stateName).encode(param);
+	  },
+	  // notify specify state
+	  // check the active statename whether to match the passed condition (stateName and param)
+	  is: function is(stateName, param, isStrict) {
+	    if (!stateName) return false;
+	    var stateName = stateName.name || stateName;
+	    var current = this.current,
+	        currentName = current.name;
+	    var matchPath = isStrict ? currentName === stateName : (currentName + ".").indexOf(stateName + ".") === 0;
+	    return matchPath && (!param || _.eql(param, this.param));
+	  },
+	  // after pathchange changed
+	  // @TODO: afterPathChange need based on decode
+	  _afterPathChange: function _afterPathChange(path, options, callback) {
+	
+	    this.emit("history:change", path);
+	
+	    var found = this.decode(path);
+	
+	    this.path = path;
+	
+	    options = options || {};
+	
+	    if (!found) {
+	      // loc.nav("$default", {silent: true})
+	      options.path = path;
+	      return this._notfound(options);
+	    }
+	
+	    options.param = found.param;
+	
+	    this._go(found, options, callback);
+	  },
+	  _notfound: function _notfound(options) {
+	    var $notfound = this.state("$notfound");
+	    if ($notfound) this._go($notfound, options);
+	
+	    return this.emit("notfound", options);
+	  },
+	  // goto the state with some option
+	  _go: function _go(state, option, callback) {
+	    var over;
+	
+	    if (typeof state === "string") state = this.state(state);
+	
+	    if (!state) return _.log("destination is not defined");
+	    if (state.hasNext && this.strict) return this._notfound({ name: state.name });
+	
+	    // not touch the end in previous transtion
+	
+	    if (this.active !== this.current) {
+	      // we need return
+	
+	      _.log("naving to [" + this.current.name + "] will be stoped, trying to [" + state.name + "] now");
+	      if (this.active.done) {
+	        this.active.done(false);
+	      }
+	      this.current = this.active;
+	      // back to before
+	    }
+	    option.param = option.param || {};
+	    this.param = option.param;
+	
+	    var current = this.current,
+	        baseState = this._findBase(current, state),
+	        self = this;
+	
+	    if (typeof callback === "function") this._stashCallback.push(callback);
+	    // if we done the navigating when start
+	    var done = function done(success) {
+	      over = true;
+	      self.current = self.active;
+	      if (success !== false) self.emit("end");
+	      self._popStash();
+	    };
+	
+	    if (current !== state) {
+	      self.emit("begin", {
+	        previous: current,
+	        current: state,
+	        param: option.param,
+	        stop: function stop() {
+	          done(false);
+	        }
+	      });
+	      if (over === true) {
+	        return current !== this && this.nav(current.encode(current.param), { silent: true });
+	      }
+	      this.previous = current;
+	      this.current = state;
+	      this._leave(baseState, option, function (success) {
+	        self._checkQueryAndParam(baseState, option);
+	        if (success === false) return done(success);
+	        self._enter(state, option, done);
+	      });
+	    } else {
+	      self._checkQueryAndParam(baseState, option);
+	      done();
+	    }
+	  },
+	  _popStash: function _popStash() {
+	    var stash = this._stashCallback,
+	        len = stash.length;
+	    this._stashCallback = [];
+	    if (!len) return;
+	
+	    for (var i = 0; i < len; i++) {
+	      stash[i].call(this);
+	    }
+	  },
+	
+	  _findQuery: function _findQuery(querystr) {
+	    var queries = querystr && querystr.split("&"),
+	        query = {};
+	    if (queries) {
+	      var len = queries.length;
+	      var query = {};
+	      for (var i = 0; i < len; i++) {
+	        var tmp = queries[i].split("=");
+	        query[tmp[0]] = tmp[1];
+	      }
+	    }
+	    return query;
+	  },
+	  _findState: function _findState(state, path) {
+	    var states = state._states,
+	        found,
+	        param;
+	
+	    // leaf-state has the high priority upon branch-state
+	    if (state.hasNext) {
+	      for (var i in states) if (states.hasOwnProperty(i)) {
+	        found = this._findState(states[i], path);
+	        if (found) return found;
+	      }
+	    }
+	    // in strict mode only leaf can be touched
+	    // if all children is don. will try it self
+	    param = state.regexp && state.decode(path);
+	    if (param) {
+	      state.param = param;
+	      return state;
+	    } else {
+	      return false;
+	    }
+	  },
+	  // find the same branch;
+	  _findBase: function _findBase(now, before) {
+	    if (!now || !before || now == this || before == this) return this;
+	    var np = now,
+	        bp = before,
+	        tmp;
+	    while (np && bp) {
+	      tmp = bp;
+	      while (tmp) {
+	        if (np === tmp) return tmp;
+	        tmp = tmp.parent;
+	      }
+	      np = np.parent;
+	    }
+	    return this;
+	  },
+	  _enter: function _enter(end, options, callback) {
+	
+	    callback = callback || _.noop;
+	
+	    var active = this.active;
+	
+	    if (active == end) return callback();
+	    var stage = [];
+	    while (end !== active && end) {
+	      stage.push(end);
+	      end = end.parent;
+	    }
+	    this._enterOne(stage, options, callback);
+	  },
+	  _enterOne: function _enterOne(stage, options, callback) {
+	
+	    var cur = stage.pop(),
+	        self = this;
+	    if (!cur) return callback();
+	
+	    this.active = cur;
+	
+	    cur.done = function (success) {
+	      cur._pending = false;
+	      cur.done = null;
+	      cur.visited = true;
+	      if (success !== false) {
+	        self._enterOne(stage, options, callback);
+	      } else {
+	        return callback(success);
+	      }
+	    };
+	
+	    if (!cur.enter) cur.done();else {
+	      var success = cur.enter(options);
+	      if (!cur._pending && cur.done) cur.done(success);
+	    }
+	  },
+	  _leave: function _leave(end, options, callback) {
+	    callback = callback || _.noop;
+	    if (end == this.active) return callback();
+	    this._leaveOne(end, options, callback);
+	  },
+	  _leaveOne: function _leaveOne(end, options, callback) {
+	    if (end === this.active) return callback();
+	    var cur = this.active,
+	        self = this;
+	    cur.done = function (success) {
+	      cur._pending = false;
+	      cur.done = null;
+	      if (success !== false) {
+	        if (cur.parent) self.active = cur.parent;
+	        self._leaveOne(end, options, callback);
+	      } else {
+	        return callback(success);
+	      }
+	    };
+	    if (!cur.leave) cur.done();else {
+	      var success = cur.leave(options);
+	      if (!cur._pending && cur.done) cur.done(success);
+	    }
+	  },
+	  // check the query and Param
+	  _checkQueryAndParam: function _checkQueryAndParam(baseState, options) {
+	    var from = baseState;
+	    while (from !== this) {
+	      from.update && from.update(options);
+	      from = from.parent;
+	    }
+	  }
+	
+	}, true);
+	
+	module.exports = StateMan;
 
-	var env = __webpack_require__(4);
-	var config = __webpack_require__(10);
-	var Regular = module.exports = __webpack_require__(11);
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _ = __webpack_require__(5);
+	
+	function State(option) {
+	  this._states = {};
+	  this._pending = false;
+	  this.visited = false;
+	  if (option) this.config(option);
+	}
+	
+	//regexp cache
+	State.rCache = {};
+	
+	_.extend(_.emitable(State), {
+	
+	  state: function state(stateName, config) {
+	    if (_.typeOf(stateName) === "object") {
+	      for (var i in stateName) {
+	        this.state(i, stateName[i]);
+	      }
+	      return this;
+	    }
+	    var current,
+	        next,
+	        nextName,
+	        states = this._states,
+	        i = 0;
+	
+	    if (typeof stateName === "string") stateName = stateName.split(".");
+	
+	    var slen = stateName.length,
+	        current = this;
+	    var stack = [];
+	
+	    do {
+	      nextName = stateName[i];
+	      next = states[nextName];
+	      stack.push(nextName);
+	      if (!next) {
+	        if (!config) return;
+	        next = states[nextName] = new State();
+	        _.extend(next, {
+	          parent: current,
+	          manager: current.manager || current,
+	          name: stack.join("."),
+	          currentName: nextName
+	        });
+	        current.hasNext = true;
+	        next.configUrl();
+	      }
+	      current = next;
+	      states = next._states;
+	    } while (++i < slen);
+	
+	    if (config) {
+	      next.config(config);
+	      return this;
+	    } else {
+	      return current;
+	    }
+	  },
+	
+	  config: function config(configure) {
+	    if (!configure) return;
+	    configure = this._getConfig(configure);
+	
+	    for (var i in configure) {
+	      var prop = configure[i];
+	      switch (i) {
+	        case "url":
+	          if (typeof prop === "string") {
+	            this.url = prop;
+	            this.configUrl();
+	          }
+	          break;
+	        case "events":
+	          this.on(prop);
+	          break;
+	        default:
+	          this[i] = prop;
+	      }
+	    }
+	  },
+	
+	  // children override
+	  _getConfig: function _getConfig(configure) {
+	    return typeof configure === "function" ? { enter: configure } : configure;
+	  },
+	
+	  //from url
+	
+	  configUrl: function configUrl() {
+	    var url = "",
+	        base = this,
+	        currentUrl;
+	    var _watchedParam = [];
+	
+	    while (base) {
+	
+	      url = (typeof base.url === "string" ? base.url : base.currentName || "") + "/" + url;
+	
+	      // means absolute;
+	      if (url.indexOf("^/") === 0) {
+	        url = url.slice(1);
+	        break;
+	      }
+	      base = base.parent;
+	    }
+	    this.pattern = _.cleanPath("/" + url);
+	    var pathAndQuery = this.pattern.split("?");
+	    this.pattern = pathAndQuery[0];
+	    // some Query we need watched
+	
+	    _.extend(this, _.normalize(this.pattern), true);
+	  },
+	  encode: function encode(param) {
+	    var state = this;
+	    param = param || {};
+	
+	    var matched = "%";
+	
+	    var url = state.matches.replace(/\(([\w-]+)\)/g, function (all, capture) {
+	      var sec = param[capture] || "";
+	      matched += capture + "%";
+	      return sec;
+	    }) + "?";
+	
+	    // remained is the query, we need concat them after url as query
+	    for (var i in param) {
+	      if (matched.indexOf("%" + i + "%") === -1) url += i + "=" + param[i] + "&";
+	    }
+	    return _.cleanPath(url.replace(/(?:\?|&)$/, ""));
+	  },
+	  decode: function decode(path) {
+	    var matched = this.regexp.exec(path),
+	        keys = this.keys;
+	
+	    if (matched) {
+	
+	      var param = {};
+	      for (var i = 0, len = keys.length; i < len; i++) {
+	        param[keys[i]] = matched[i + 1];
+	      }
+	      return param;
+	    } else {
+	      return false;
+	    }
+	  },
+	  async: function async() {
+	    var self = this;
+	    this._pending = true;
+	    return this.done;
+	  }
+	
+	});
+	
+	module.exports = State;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var _ = module.exports = {};
+	var slice = [].slice,
+	    o2str = ({}).toString;
+	
+	// merge o2's properties to Object o1.
+	_.extend = function (o1, o2, override) {
+	  for (var i in o2) if (override || o1[i] === undefined) {
+	    o1[i] = o2[i];
+	  }
+	  return o1;
+	};
+	
+	// Object.create shim
+	_.ocreate = Object.create || function (o) {
+	  var Foo = function Foo() {};
+	  Foo.prototype = o;
+	  return new Foo();
+	};
+	
+	_.slice = function (arr, index) {
+	  return slice.call(arr, index);
+	};
+	
+	_.typeOf = function typeOf(o) {
+	  return o == null ? String(o) : o2str.call(o).slice(8, -1).toLowerCase();
+	};
+	
+	//strict eql
+	_.eql = function (o1, o2) {
+	  var t1 = _.typeOf(o1),
+	      t2 = _.typeOf(o2);
+	  if (t1 !== t2) return false;
+	  if (t1 === 'object') {
+	    var equal = true;
+	    // only check the first's propertie
+	    for (var i in o1) {
+	      if (o1[i] !== o2[i]) equal = false;
+	    }
+	    return equal;
+	  }
+	  return o1 === o2;
+	};
+	
+	// small emitter
+	_.emitable = (function () {
+	  var API = {
+	    once: function once(event, fn) {
+	      var callback = function callback() {
+	        fn.apply(this, arguments);
+	        this.off(event, callback);
+	      };
+	      return this.on(event, callback);
+	    },
+	    on: function on(event, fn) {
+	      if (typeof event === 'object') {
+	        for (var i in event) {
+	          this.on(i, event[i]);
+	        }
+	      } else {
+	        var handles = this._handles || (this._handles = {}),
+	            calls = handles[event] || (handles[event] = []);
+	        calls.push(fn);
+	      }
+	      return this;
+	    },
+	    off: function off(event, fn) {
+	      if (!event || !this._handles) this._handles = {};
+	      if (!this._handles) return;
+	
+	      var handles = this._handles,
+	          calls;
+	
+	      if (calls = handles[event]) {
+	        if (!fn) {
+	          handles[event] = [];
+	          return this;
+	        }
+	        for (var i = 0, len = calls.length; i < len; i++) {
+	          if (fn === calls[i]) {
+	            calls.splice(i, 1);
+	            return this;
+	          }
+	        }
+	      }
+	      return this;
+	    },
+	    emit: function emit(event) {
+	      var args = _.slice(arguments, 1),
+	          handles = this._handles,
+	          calls;
+	
+	      if (!handles || !(calls = handles[event])) return this;
+	      for (var i = 0, len = calls.length; i < len; i++) {
+	        calls[i].apply(this, args);
+	      }
+	      return this;
+	    }
+	  };
+	  return function (obj) {
+	    obj = typeof obj == "function" ? obj.prototype : obj;
+	    return _.extend(obj, API);
+	  };
+	})();
+	
+	_.noop = function () {};
+	
+	_.bind = function (fn, context) {
+	  return function () {
+	    return fn.apply(context, arguments);
+	  };
+	};
+	
+	var rDbSlash = /\/+/g,
+	    // double slash
+	rEndSlash = /\/$/; // end slash
+	
+	_.cleanPath = function (path) {
+	  return ("/" + path).replace(rDbSlash, "/").replace(rEndSlash, "") || "/";
+	};
+	
+	// normalize the path
+	function normalizePath(path) {
+	  // means is from
+	  // (?:\:([\w-]+))?(?:\(([^\/]+?)\))|(\*{2,})|(\*(?!\*)))/g
+	  var preIndex = 0;
+	  var keys = [];
+	  var index = 0;
+	  var matches = "";
+	
+	  path = _.cleanPath(path);
+	
+	  var regStr = path
+	  //  :id(capture)? | (capture)   |  ** | *
+	  .replace(/\:([\w-]+)(?:\(([^\/]+?)\))?|(?:\(([^\/]+)\))|(\*{2,})|(\*(?!\*))/g, function (all, key, keyformat, capture, mwild, swild, startAt) {
+	    // move the uncaptured fragment in the path
+	    if (startAt > preIndex) matches += path.slice(preIndex, startAt);
+	    preIndex = startAt + all.length;
+	    if (key) {
+	      matches += "(" + key + ")";
+	      keys.push(key);
+	      return "(" + (keyformat || "[\\w-]+") + ")";
+	    }
+	    matches += "(" + index + ")";
+	
+	    keys.push(index++);
+	
+	    if (capture) {
+	      // sub capture detect
+	      return "(" + capture + ")";
+	    }
+	    if (mwild) return "(.*)";
+	    if (swild) return "([^\\/]*)";
+	  });
+	
+	  if (preIndex !== path.length) matches += path.slice(preIndex);
+	
+	  return {
+	    regexp: new RegExp("^" + regStr + "/?$"),
+	    keys: keys,
+	    matches: matches || path
+	  };
+	}
+	
+	_.log = function (msg, type) {
+	  typeof console !== "undefined" && console[type || "log"](msg);
+	};
+	
+	_.normalize = normalizePath;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	// MIT
+	// Thx Backbone.js 1.1.2  and https://github.com/cowboy/jquery-hashchange/blob/master/jquery.ba-hashchange.js
+	// for iframe patches in old ie.
+	
+	"use strict";
+	
+	var browser = __webpack_require__(7);
+	var _ = __webpack_require__(5);
+	
+	// the mode const
+	var QUIRK = 3,
+	    HASH = 1,
+	    HISTORY = 2;
+	
+	// extract History for test
+	// resolve the conficlt with the Native History
+	function Histery(options) {
+	  options = options || {};
+	
+	  // Trick from backbone.history for anchor-faked testcase
+	  this.location = options.location || browser.location;
+	
+	  // mode config, you can pass absolute mode (just for test);
+	  this.html5 = options.html5;
+	  this.mode = options.html5 && browser.history ? HISTORY : HASH;
+	  if (!browser.hash) this.mode = QUIRK;
+	  if (options.mode) this.mode = options.mode;
+	
+	  // hash prefix , used for hash or quirk mode
+	  this.prefix = "#" + (options.prefix || "");
+	  this.rPrefix = new RegExp(this.prefix + '(.*)$');
+	  this.interval = options.interval || 66;
+	
+	  // the root regexp for remove the root for the path. used in History mode
+	  this.root = options.root || "/";
+	  this.rRoot = new RegExp("^" + this.root);
+	
+	  this._fixInitState();
+	
+	  this.autolink = options.autolink !== false;
+	
+	  this.curPath = undefined;
+	}
+	
+	_.extend(_.emitable(Histery), {
+	  // check the
+	  start: function start() {
+	    var path = this.getPath();
+	    this._checkPath = _.bind(this.checkPath, this);
+	
+	    if (this.isStart) return;
+	    this.isStart = true;
+	
+	    if (this.mode === QUIRK) {
+	      this._fixHashProbelm(path);
+	    }
+	
+	    switch (this.mode) {
+	      case HASH:
+	        browser.on(window, "hashchange", this._checkPath);
+	        break;
+	      case HISTORY:
+	        browser.on(window, "popstate", this._checkPath);
+	        break;
+	      case QUIRK:
+	        this._checkLoop();
+	    }
+	    // event delegate
+	    this.autolink && this._autolink();
+	
+	    this.curPath = path;
+	
+	    this.emit("change", path);
+	  },
+	  // the history teardown
+	  stop: function stop() {
+	
+	    browser.off(window, 'hashchange', this._checkPath);
+	    browser.off(window, 'popstate', this._checkPath);
+	    clearTimeout(this.tid);
+	    this.isStart = false;
+	    this._checkPath = null;
+	  },
+	  // get the path modify
+	  checkPath: function checkPath(ev) {
+	
+	    var path = this.getPath(),
+	        curPath = this.curPath;
+	
+	    //for oldIE hash history issue
+	    if (path === curPath && this.iframe) {
+	      path = this.getPath(this.iframe.location);
+	    }
+	
+	    if (path !== curPath) {
+	      this.iframe && this.nav(path, { silent: true });
+	      this.curPath = path;
+	      this.emit('change', path);
+	    }
+	  },
+	  // get the current path
+	  getPath: function getPath(location) {
+	    var location = location || this.location,
+	        tmp;
+	    if (this.mode !== HISTORY) {
+	      tmp = location.href.match(this.rPrefix);
+	      return tmp && tmp[1] ? tmp[1] : "";
+	    } else {
+	      return _.cleanPath((location.pathname + location.search || "").replace(this.rRoot, "/"));
+	    }
+	  },
+	
+	  nav: function nav(to, options) {
+	
+	    var iframe = this.iframe;
+	
+	    options = options || {};
+	
+	    to = _.cleanPath(to);
+	
+	    if (this.curPath == to) return;
+	
+	    // pushState wont trigger the checkPath
+	    // but hashchange will
+	    // so we need set curPath before to forbit the CheckPath
+	    this.curPath = to;
+	
+	    // 3 or 1 is matched
+	    if (this.mode !== HISTORY) {
+	      this._setHash(this.location, to, options.replace);
+	      if (iframe && this.getPath(iframe.location) !== to) {
+	        if (!options.replace) iframe.document.open().close();
+	        this._setHash(this.iframe.location, to, options.replace);
+	      }
+	    } else {
+	      history[options.replace ? 'replaceState' : 'pushState']({}, options.title || "", _.cleanPath(this.root + to));
+	    }
+	
+	    if (!options.silent) this.emit('change', to);
+	  },
+	  _autolink: function _autolink() {
+	    if (this.mode !== HISTORY) return;
+	    // only in html5 mode, the autolink is works
+	    // if(this.mode !== 2) return;
+	    var prefix = this.prefix,
+	        self = this;
+	    browser.on(document.body, "click", function (ev) {
+	      var target = ev.target || ev.srcElement;
+	      if (target.tagName.toLowerCase() !== "a") return;
+	      var tmp = (browser.getHref(target) || "").match(self.rPrefix);
+	      var hash = tmp && tmp[1] ? tmp[1] : "";
+	
+	      if (!hash) return;
+	
+	      ev.preventDefault && ev.preventDefault();
+	      self.nav(hash);
+	      return ev.returnValue = false;
+	    });
+	  },
+	  _setHash: function _setHash(location, path, replace) {
+	    var href = location.href.replace(/(javascript:|#).*$/, '');
+	    if (replace) {
+	      location.replace(href + this.prefix + path);
+	    } else location.hash = this.prefix + path;
+	  },
+	  // for browser that not support onhashchange
+	  _checkLoop: function _checkLoop() {
+	    var self = this;
+	    this.tid = setTimeout(function () {
+	      self._checkPath();
+	      self._checkLoop();
+	    }, this.interval);
+	  },
+	  // if we use real url in hash env( browser no history popstate support)
+	  // or we use hash in html5supoort mode (when paste url in other url)
+	  // then , histery should repara it
+	  _fixInitState: function _fixInitState() {
+	    var pathname = _.cleanPath(this.location.pathname),
+	        hash,
+	        hashInPathName;
+	
+	    // dont support history popstate but config the html5 mode
+	    if (this.mode !== HISTORY && this.html5) {
+	
+	      hashInPathName = pathname.replace(this.rRoot, "");
+	      if (hashInPathName) this.location.replace(this.root + this.prefix + hashInPathName);
+	    } else if (this.mode === HISTORY /* && pathname === this.root*/) {
+	
+	        hash = this.location.hash.replace(this.prefix, "");
+	        if (hash) history.replaceState({}, document.title, _.cleanPath(this.root + hash));
+	      }
+	  },
+	  // Thanks for backbone.history and https://github.com/cowboy/jquery-hashchange/blob/master/jquery.ba-hashchange.js
+	  // for helping stateman fixing the oldie hash history issues when with iframe hack
+	  _fixHashProbelm: function _fixHashProbelm(path) {
+	    var iframe = document.createElement('iframe'),
+	        body = document.body;
+	    iframe.src = 'javascript:;';
+	    iframe.style.display = 'none';
+	    iframe.tabIndex = -1;
+	    iframe.title = "";
+	    this.iframe = body.insertBefore(iframe, body.firstChild).contentWindow;
+	    this.iframe.document.open().close();
+	    this.iframe.location.hash = '#' + path;
+	  }
+	
+	});
+	
+	module.exports = Histery;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var win = window,
+	    doc = document;
+	
+	var b = module.exports = {
+	  hash: "onhashchange" in win && (!doc.documentMode || doc.documentMode > 7),
+	  history: win.history && "onpopstate" in win,
+	  location: win.location,
+	  getHref: function getHref(node) {
+	    return "href" in node ? node.getAttribute("href", 2) : node.getAttribute("href");
+	  },
+	  on: "addEventListener" in win ? // IE10 attachEvent is not working when binding the onpopstate, so we need check addEventLister first
+	  function (node, type, cb) {
+	    return node.addEventListener(type, cb);
+	  } : function (node, type, cb) {
+	    return node.attachEvent("on" + type, cb);
+	  },
+	
+	  off: "removeEventListener" in win ? function (node, type, cb) {
+	    return node.removeEventListener(type, cb);
+	  } : function (node, type, cb) {
+	    return node.detachEvent("on" + type, cb);
+	  }
+	};
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var env = __webpack_require__(9);
+	var config = __webpack_require__(15);
+	var Regular = module.exports = __webpack_require__(16);
 	var Parser = Regular.Parser;
 	var Lexer = Regular.Lexer;
-
+	
 	if (env.browser) {
-	  __webpack_require__(26);
-	  __webpack_require__(30);
 	  __webpack_require__(31);
-	  Regular.dom = __webpack_require__(16);
+	  __webpack_require__(35);
+	  __webpack_require__(36);
+	  Regular.dom = __webpack_require__(21);
 	}
 	Regular.env = env;
-	Regular.util = __webpack_require__(5);
+	Regular.util = __webpack_require__(10);
 	Regular.parse = function (str, options) {
 	  options = options || {};
-
+	
 	  if (options.BEGIN || options.END) {
 	    if (options.BEGIN) config.BEGIN = options.BEGIN;
 	    if (options.END) config.END = options.END;
@@ -119,37 +1253,37 @@
 	};
 
 /***/ },
-/* 4 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// some fixture test;
 	// ---------------
 	"use strict";
-
-	var _ = __webpack_require__(5);
+	
+	var _ = __webpack_require__(10);
 	exports.svg = (function () {
 	  return typeof document !== "undefined" && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1");
 	})();
-
+	
 	exports.browser = typeof document !== "undefined" && document.nodeType;
 	// whether have component in initializing
 	exports.exprCache = _.cache(1000);
 	exports.isRunning = false;
 
 /***/ },
-/* 5 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, setImmediate) {'use strict';
-
-	__webpack_require__(8)();
-
+	
+	__webpack_require__(13)();
+	
 	var _ = module.exports;
-	var entities = __webpack_require__(9);
+	var entities = __webpack_require__(14);
 	var slice = [].slice;
 	var o2str = ({}).toString;
 	var win = typeof window !== 'undefined' ? window : global;
-
+	
 	_.noop = function () {};
 	_.uid = (function () {
 	  var _uid = 0;
@@ -157,7 +1291,7 @@
 	    return _uid++;
 	  };
 	})();
-
+	
 	_.extend = function (o1, o2, override) {
 	  // if(_.typeOf(override) === 'array'){
 	  //  for(var i = 0, len = override.length; i < len; i++ ){
@@ -173,7 +1307,7 @@
 	  // }
 	  return o1;
 	};
-
+	
 	_.keys = function (obj) {
 	  if (Object.keys) return Object.keys(obj);
 	  var res = [];
@@ -182,21 +1316,21 @@
 	  }
 	  return res;
 	};
-
+	
 	_.varName = 'd';
 	_.setName = 'p_';
 	_.ctxName = 'c';
 	_.extName = 'e';
-
+	
 	_.rWord = /^[\$\w]+$/;
 	_.rSimpleAccessor = /^[\$\w]+(\.[\$\w]+)*$/;
-
+	
 	_.nextTick = typeof setImmediate === 'function' ? setImmediate.bind(win) : function (callback) {
 	  setTimeout(callback, 0);
 	};
-
+	
 	_.prefix = "var " + _.varName + "=" + _.ctxName + ".data;" + _.extName + "=" + _.extName + "||'';";
-
+	
 	_.slice = function (obj, start, end) {
 	  var res = [];
 	  for (var i = start || 0, len = end || obj.length; i < len; i++) {
@@ -205,11 +1339,11 @@
 	  }
 	  return res;
 	};
-
+	
 	_.typeOf = function (o) {
 	  return o == null ? String(o) : o2str.call(o).slice(8, -1).toLowerCase();
 	};
-
+	
 	_.makePredicate = function makePredicate(words, prefix) {
 	  if (typeof words === "string") {
 	    words = words.split(" ");
@@ -233,7 +1367,7 @@
 	    }
 	    f += "return true}return false;";
 	  }
-
+	
 	  // When there are more than three length categories, an outer
 	  // switch first dispatches on the lengths, to save on comparisons.
 	  if (cats.length > 3) {
@@ -247,14 +1381,14 @@
 	      compareTo(cat);
 	    }
 	    f += "}";
-
+	
 	    // Otherwise, simply generate a flat `switch` statement.
 	  } else {
 	      compareTo(words);
 	    }
 	  return new Function("str", f);
 	};
-
+	
 	_.trackErrorPos = (function () {
 	  // linebreak
 	  var lb = /\r\n|[\n\r\u2028\u2029]/g;
@@ -264,7 +1398,7 @@
 	    var tmpLen = 0;
 	    for (var i = 0, len = lines.length; i < len; i++) {
 	      var lineLen = (lines[i] || "").length;
-
+	
 	      if (tmpLen + lineLen > pos) {
 	        return { num: i, line: lines[i], start: pos - i - tmpLen, prev: lines[i - 1], next: lines[i + 1] };
 	      }
@@ -278,7 +1412,7 @@
 	    if (min < 0) min = 0;
 	    var max = start + maxRange;
 	    if (max > len) max = len;
-
+	
 	    var remain = str.slice(min, max);
 	    var prefix = "[" + (num + 1) + "] " + (min > 0 ? ".." : "");
 	    var postfix = max < len ? ".." : "";
@@ -293,11 +1427,11 @@
 	    var line = findLine(lines, pos);
 	    var start = line.start,
 	        num = line.num;
-
+	
 	    return (line.prev ? formatLine(line.prev, start, num - 1) + '\n' : '') + formatLine(line.line, start, num, true) + '\n' + (line.next ? formatLine(line.next, start, num + 1) + '\n' : '');
 	  };
 	})();
-
+	
 	var ignoredRef = /\((\?\!|\?\:|\?\=)/g;
 	_.findSubCapture = function (regStr) {
 	  var left = 0,
@@ -314,28 +1448,28 @@
 	  }
 	  if (left !== right) throw "RegExp: " + regStr + "'s bracket is not marched";else return left - ignored;
 	};
-
+	
 	_.escapeRegExp = function (str) {
 	  // Credit: XRegExp 0.6.1 (c) 2007-2008 Steven Levithan <http://stevenlevithan.com/regex/xregexp/> MIT License
 	  return str.replace(/[-[\]{}()*+?.\\^$|,#\s]/g, function (match) {
 	    return '\\' + match;
 	  });
 	};
-
+	
 	var rEntity = new RegExp("&(?:(#x[0-9a-fA-F]+)|(#[0-9]+)|(" + _.keys(entities).join('|') + '));', 'gi');
-
+	
 	_.convertEntity = function (chr) {
-
+	
 	  return ("" + chr).replace(rEntity, function (all, hex, dec, capture) {
 	    var charCode;
 	    if (dec) charCode = parseInt(dec.slice(1), 10);else if (hex) charCode = parseInt(hex.slice(2), 16);else charCode = entities[capture];
-
+	
 	    return String.fromCharCode(charCode);
 	  });
 	};
-
+	
 	// simple get accessor
-
+	
 	_.createObject = function (o, props) {
 	  function Foo() {}
 	  Foo.prototype = o;
@@ -343,7 +1477,7 @@
 	  if (props) _.extend(res, props);
 	  return res;
 	};
-
+	
 	_.createProto = function (fn, o) {
 	  function Foo() {
 	    this.constructor = fn;
@@ -351,7 +1485,7 @@
 	  Foo.prototype = o;
 	  return fn.prototype = new Foo();
 	};
-
+	
 	/**
 	clone
 	*/
@@ -373,20 +1507,20 @@
 	  }
 	  return obj;
 	};
-
+	
 	_.equals = function (now, old) {
 	  var type = typeof now;
 	  if (type === 'number' && typeof old === 'number' && isNaN(now) && isNaN(old)) return true;
 	  return now === old;
 	};
-
+	
 	var dash = /-([a-z])/g;
 	_.camelCase = function (str) {
 	  return str.replace(dash, function (all, capture) {
 	    return capture.toUpperCase();
 	  });
 	};
-
+	
 	_.throttle = function throttle(func, wait) {
 	  var wait = wait || 100;
 	  var context, args, result;
@@ -415,7 +1549,7 @@
 	    return result;
 	  };
 	};
-
+	
 	// hogan escape
 	// ==============
 	_.escape = (function () {
@@ -425,12 +1559,12 @@
 	      rApos = /\'/g,
 	      rQuot = /\"/g,
 	      hChars = /[&<>\"\']/;
-
+	
 	  return function (str) {
 	    return hChars.test(str) ? str.replace(rAmp, '&amp;').replace(rLt, '&lt;').replace(rGt, '&gt;').replace(rApos, '&#39;').replace(rQuot, '&quot;') : str;
 	  };
 	})();
-
+	
 	_.cache = function (max) {
 	  max = max || 1000;
 	  var keys = [],
@@ -457,14 +1591,14 @@
 	    }
 	  };
 	};
-
+	
 	// // setup the raw Expression
 	// _.touchExpression = function(expr){
 	//   if(expr.type === 'expression'){
 	//   }
 	//   return expr;
 	// }
-
+	
 	// handle the same logic on component's `on-*` and element's `on-*`
 	// return the fire object
 	_.handleEvent = function (value, type) {
@@ -494,7 +1628,7 @@
 	    };
 	  }
 	};
-
+	
 	// only call once
 	_.once = function (fn) {
 	  var time = 0;
@@ -502,14 +1636,14 @@
 	    if (time++ === 0) fn.apply(this, arguments);
 	  };
 	};
-
+	
 	_.fixObjStr = function (str) {
 	  if (str.trim().indexOf('{') !== 0) {
 	    return '{' + str + '}';
 	  }
 	  return str;
 	};
-
+	
 	_.map = function (array, callback) {
 	  var res = [];
 	  for (var i = 0, len = array.length; i < len; i++) {
@@ -517,24 +1651,24 @@
 	  }
 	  return res;
 	};
-
+	
 	function log(msg, type) {
 	  if (typeof console !== "undefined") console[type || "log"](msg);
 	}
-
+	
 	_.log = log;
-
+	
 	//http://www.w3.org/html/wg/drafts/html/master/single-page.html#void-elements
 	_.isVoidTag = _.makePredicate("area base br col embed hr img input keygen link menuitem meta param source track wbr r-content");
 	_.isBooleanAttr = _.makePredicate('selected checked disabled readonly required open autofocus controls autoplay compact loop defer multiple');
-
+	
 	_.isFalse - function () {
 	  return false;
 	};
 	_.isTrue - function () {
 	  return true;
 	};
-
+	
 	_.isExpr = function (expr) {
 	  return expr && expr.type === 'expression';
 	};
@@ -542,26 +1676,26 @@
 	_.isGroup = function (group) {
 	  return group.inject || group.$inject;
 	};
-
+	
 	_.getCompileFn = function (source, ctx, options) {
 	  return ctx.$compile.bind(ctx, source, options);
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(11).setImmediate))
 
 /***/ },
-/* 6 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {"use strict";
-
-	var nextTick = __webpack_require__(7).nextTick;
+	
+	var nextTick = __webpack_require__(12).nextTick;
 	var apply = Function.prototype.apply;
 	var slice = Array.prototype.slice;
 	var immediateIds = {};
 	var nextImmediateId = 0;
-
+	
 	// DOM APIs, for completeness
-
+	
 	exports.setTimeout = function () {
 	  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
 	};
@@ -571,7 +1705,7 @@
 	exports.clearTimeout = exports.clearInterval = function (timeout) {
 	  timeout.close();
 	};
-
+	
 	function Timeout(id, clearFn) {
 	  this._id = id;
 	  this._clearFn = clearFn;
@@ -580,21 +1714,21 @@
 	Timeout.prototype.close = function () {
 	  this._clearFn.call(window, this._id);
 	};
-
+	
 	// Does not start the time, just sets up the members needed.
 	exports.enroll = function (item, msecs) {
 	  clearTimeout(item._idleTimeoutId);
 	  item._idleTimeout = msecs;
 	};
-
+	
 	exports.unenroll = function (item) {
 	  clearTimeout(item._idleTimeoutId);
 	  item._idleTimeout = -1;
 	};
-
+	
 	exports._unrefActive = exports.active = function (item) {
 	  clearTimeout(item._idleTimeoutId);
-
+	
 	  var msecs = item._idleTimeout;
 	  if (msecs >= 0) {
 	    item._idleTimeoutId = setTimeout(function onTimeout() {
@@ -602,14 +1736,14 @@
 	    }, msecs);
 	  }
 	};
-
+	
 	// That's not how node.js implements it but the exposed api is the same.
 	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function (fn) {
 	  var id = nextImmediateId++;
 	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
+	
 	  immediateIds[id] = true;
-
+	
 	  nextTick(function onNextTick() {
 	    if (immediateIds[id]) {
 	      // fn.call() is faster so we optimize for the common use-case
@@ -623,29 +1757,29 @@
 	      exports.clearImmediate(id);
 	    }
 	  });
-
+	
 	  return id;
 	};
-
+	
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function (id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).setImmediate, __webpack_require__(6).clearImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11).setImmediate, __webpack_require__(11).clearImmediate))
 
 /***/ },
-/* 7 */
+/* 12 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
+	
 	'use strict';
-
+	
 	var process = module.exports = {};
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
-
+	
 	function cleanUpNextTick() {
 	    draining = false;
 	    if (currentQueue.length) {
@@ -657,14 +1791,14 @@
 	        drainQueue();
 	    }
 	}
-
+	
 	function drainQueue() {
 	    if (draining) {
 	        return;
 	    }
 	    var timeout = setTimeout(cleanUpNextTick);
 	    draining = true;
-
+	
 	    var len = queue.length;
 	    while (len) {
 	        currentQueue = queue;
@@ -681,7 +1815,7 @@
 	    draining = false;
 	    clearTimeout(timeout);
 	}
-
+	
 	process.nextTick = function (fun) {
 	    var args = new Array(arguments.length - 1);
 	    if (arguments.length > 1) {
@@ -694,7 +1828,7 @@
 	        setTimeout(drainQueue, 0);
 	    }
 	};
-
+	
 	// v8 likes predictible objects
 	function Item(fun, array) {
 	    this.fun = fun;
@@ -709,9 +1843,9 @@
 	process.argv = [];
 	process.version = ''; // empty string to avoid regexp issues
 	process.versions = {};
-
+	
 	function noop() {}
-
+	
 	process.on = noop;
 	process.addListener = noop;
 	process.once = noop;
@@ -719,11 +1853,11 @@
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
-
+	
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
 	};
-
+	
 	process.cwd = function () {
 	    return '/';
 	};
@@ -735,22 +1869,22 @@
 	};
 
 /***/ },
-/* 8 */
+/* 13 */
 /***/ function(module, exports) {
 
 	// shim for es5
 	"use strict";
-
+	
 	var slice = [].slice;
 	var tstr = ({}).toString;
-
+	
 	function extend(o1, o2) {
 	  for (var i in o2) if (o1[i] === undefined) {
 	    o1[i] = o2[i];
 	  }
 	  return o2;
 	}
-
+	
 	module.exports = function () {
 	  // String proto ;
 	  extend(String.prototype, {
@@ -758,7 +1892,7 @@
 	      return this.replace(/^\s+|\s+$/g, '');
 	    }
 	  });
-
+	
 	  // Array proto;
 	  extend(Array.prototype, {
 	    indexOf: function indexOf(obj, from) {
@@ -772,25 +1906,25 @@
 	    // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
 	    forEach: function forEach(callback, ctx) {
 	      var k = 0;
-
+	
 	      // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
 	      var O = Object(this);
-
+	
 	      var len = O.length >>> 0;
-
+	
 	      if (typeof callback !== "function") {
 	        throw new TypeError(callback + " is not a function");
 	      }
-
+	
 	      // 7. Repeat, while k < len
 	      while (k < len) {
-
+	
 	        var kValue;
-
+	
 	        if (k in O) {
-
+	
 	          kValue = O[k];
-
+	
 	          callback.call(ctx, kValue, k, O);
 	        }
 	        k++;
@@ -799,11 +1933,11 @@
 	    // @deprecated
 	    //  will be removed at 0.5.0
 	    filter: function filter(fun, context) {
-
+	
 	      var t = Object(this);
 	      var len = t.length >>> 0;
 	      if (typeof fun !== "function") throw new TypeError();
-
+	
 	      var res = [];
 	      for (var i = 0; i < len; i++) {
 	        if (i in t) {
@@ -811,11 +1945,11 @@
 	          if (fun.call(context, val, i, t)) res.push(val);
 	        }
 	      }
-
+	
 	      return res;
 	    }
 	  });
-
+	
 	  // Function proto;
 	  extend(Function.prototype, {
 	    bind: function bind(context) {
@@ -827,7 +1961,7 @@
 	      };
 	    }
 	  });
-
+	
 	  // Array
 	  extend(Array, {
 	    isArray: function isArray(arr) {
@@ -837,12 +1971,12 @@
 	};
 
 /***/ },
-/* 9 */
+/* 14 */
 /***/ function(module, exports) {
 
 	// http://stackoverflow.com/questions/1354064/how-to-convert-characters-to-html-entities-using-plain-javascript
 	'use strict';
-
+	
 	var entities = {
 	  'quot': 34,
 	  'amp': 38,
@@ -1098,45 +2232,45 @@
 	  'rsaquo': 8250,
 	  'euro': 8364
 	};
-
+	
 	module.exports = entities;
 
 /***/ },
-/* 10 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
-
+	
 	module.exports = {
 	  'BEGIN': '{',
 	  'END': '}'
 	};
 
 /***/ },
-/* 11 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var env = __webpack_require__(4);
-	var Lexer = __webpack_require__(12);
-	var Parser = __webpack_require__(13);
-	var _config = __webpack_require__(10);
-	var _ = __webpack_require__(5);
-	var extend = __webpack_require__(15);
+	
+	var env = __webpack_require__(9);
+	var Lexer = __webpack_require__(17);
+	var Parser = __webpack_require__(18);
+	var _config = __webpack_require__(15);
+	var _ = __webpack_require__(10);
+	var extend = __webpack_require__(20);
 	var combine = {};
 	if (env.browser) {
-	  var dom = __webpack_require__(16);
-	  var walkers = __webpack_require__(17);
-	  var Group = __webpack_require__(21);
+	  var dom = __webpack_require__(21);
+	  var walkers = __webpack_require__(22);
+	  var Group = __webpack_require__(26);
 	  var doc = dom.doc;
-	  combine = __webpack_require__(19);
+	  combine = __webpack_require__(24);
 	}
-	var events = __webpack_require__(22);
-	var Watcher = __webpack_require__(23);
-	var parse = __webpack_require__(24);
-	var filter = __webpack_require__(25);
-
+	var events = __webpack_require__(27);
+	var Watcher = __webpack_require__(28);
+	var parse = __webpack_require__(29);
+	var filter = __webpack_require__(30);
+	
 	/**
 	* `Regular` is regularjs's NameSpace and BaseClass. Every Component is inherited from it
 	* 
@@ -1149,26 +2283,26 @@
 	  var prevRunning = env.isRunning;
 	  env.isRunning = true;
 	  var node, template;
-
+	
 	  definition = definition || {};
 	  options = options || {};
-
+	
 	  definition.data = definition.data || {};
 	  definition.computed = definition.computed || {};
 	  definition.events = definition.events || {};
 	  if (this.data) _.extend(definition.data, this.data);
 	  if (this.computed) _.extend(definition.computed, this.computed);
 	  if (this.events) _.extend(definition.events, this.events);
-
+	
 	  _.extend(this, definition, true);
 	  if (this.$parent) {
 	    this.$parent._append(this);
 	  }
 	  this._children = [];
 	  this.$refs = {};
-
+	
 	  template = this.template;
-
+	
 	  // template is a string (len < 16). we will find it container first
 	  if (typeof template === 'string' && template.length < 16 && (node = dom.find(template))) {
 	    template = node.innerHTML;
@@ -1176,7 +2310,7 @@
 	  // if template is a xml
 	  if (template && template.nodeType) template = template.innerHTML;
 	  if (typeof template === 'string') this.template = new Parser(template).parse();
-
+	
 	  this.computed = handleComputed(this.computed);
 	  this.$root = this.$root || this;
 	  // if have events
@@ -1185,10 +2319,10 @@
 	  }
 	  this.$emit("$config");
 	  this.config && this.config(this.data);
-
+	
 	  var body = this._body;
 	  this._body = null;
-
+	
 	  if (body && body.ast && body.ast.length) {
 	    this.$body = _.getCompileFn(body.ast, body.ctx, {
 	      outer: this,
@@ -1202,21 +2336,21 @@
 	    this.group = this.$compile(this.template, { namespace: options.namespace });
 	    combine.node(this);
 	  }
-
+	
 	  if (!this.$parent) this.$update();
 	  this.$ready = true;
 	  this.$emit("$init");
 	  if (this.init) this.init(this.data);
-
+	
 	  // @TODO: remove, maybe , there is no need to update after init;
 	  // if(this.$root === this) this.$update();
 	  env.isRunning = prevRunning;
-
+	
 	  // children is not required;
 	};
-
+	
 	walkers && (walkers.Regular = Regular);
-
+	
 	// description
 	// -------------------------
 	// 1. Regular and derived Class use same filter
@@ -1226,10 +2360,10 @@
 	  _plugins: {},
 	  _protoInheritCache: ['directive', 'use'],
 	  __after__: function __after__(supr, o) {
-
+	
 	    var template;
 	    this.__after__ = supr.__after__;
-
+	
 	    // use name make the component global.
 	    if (o.name) Regular.component(o.name, this);
 	    // this.prototype.template = dom.initTemplate(o)
@@ -1239,14 +2373,14 @@
 	        template = node.innerHTML;
 	        if (name = dom.attr(node, 'name')) Regular.component(name, this);
 	      }
-
+	
 	      if (template.nodeType) template = template.innerHTML;
-
+	
 	      if (typeof template === 'string') {
 	        this.prototype.template = new Parser(template).parse();
 	      }
 	    }
-
+	
 	    if (o.computed) this.prototype.computed = handleComputed(o.computed);
 	    // inherit directive and other config from supr
 	    Regular._inheritConfig(this, supr);
@@ -1258,7 +2392,7 @@
 	   * @return {Object} Copy of ...
 	   */
 	  directive: function directive(name, cfg) {
-
+	
 	    if (_.typeOf(name) === "object") {
 	      for (var k in name) {
 	        if (name.hasOwnProperty(k)) this.directive(k, name[k]);
@@ -1323,7 +2457,7 @@
 	    if (Regular[name]) return;
 	    Regular[name] = function (key, cfg) {
 	      var cache = this[cacheKey];
-
+	
 	      if (typeof key === "object") {
 	        for (var i in key) {
 	          if (key.hasOwnProperty(i)) this[name](i, key[i]);
@@ -1336,7 +2470,7 @@
 	    };
 	  },
 	  _inheritConfig: function _inheritConfig(self, supr) {
-
+	
 	    // prototype inherit some Regular property
 	    // so every Component will have own container to serve directive, filter etc..
 	    var defs = Regular._protoInheritCache;
@@ -1348,20 +2482,20 @@
 	    });
 	    return self;
 	  }
-
+	
 	});
-
+	
 	extend(Regular);
-
+	
 	Regular._addProtoInheritCache("component");
-
+	
 	Regular._addProtoInheritCache("filter", function (cfg) {
 	  return typeof cfg === "function" ? { get: cfg } : cfg;
 	});
-
+	
 	events.mixTo(Regular);
 	Watcher.mixTo(Regular);
-
+	
 	Regular.implement({
 	  init: function init() {},
 	  config: function config() {},
@@ -1383,7 +2517,7 @@
 	    this._handles = null;
 	    this.$refs = null;
 	  },
-
+	
 	  /**
 	   * compile a block ast ; return a group;
 	   * @param  {Array} parsed ast
@@ -1398,9 +2532,9 @@
 	    var preExt = this.__ext__,
 	        record = options.record,
 	        records;
-
+	
 	    if (options.extra) this.__ext__ = options.extra;
-
+	
 	    if (record) this._record();
 	    var group = this._walk(ast, options);
 	    if (record) {
@@ -1416,7 +2550,7 @@
 	    if (options.extra) this.__ext__ = preExt;
 	    return group;
 	  },
-
+	
 	  /**
 	   * create two-way binding with another component;
 	   * *warn*: 
@@ -1473,30 +2607,30 @@
 	  },
 	  $inject: combine.inject,
 	  $mute: function $mute(isMute) {
-
+	
 	    isMute = !!isMute;
-
+	
 	    var needupdate = isMute === false && this._mute;
-
+	
 	    this._mute = !!isMute;
-
+	
 	    if (needupdate) this.$update();
 	    return this;
 	  },
 	  // private bind logic
 	  _bind: function _bind(component, expr1, expr2) {
-
+	
 	    var self = this;
 	    // basic binding
-
+	
 	    if (!component || !(component instanceof Regular)) throw "$bind() should pass Regular component as first argument";
 	    if (!expr1) throw "$bind() should  pass as least one expression to bind";
-
+	
 	    if (!expr2) expr2 = expr1;
-
+	
 	    expr1 = parse.expression(expr1);
 	    expr2 = parse.expression(expr2);
-
+	
 	    // set is need to operate setting ;
 	    if (expr2.set) {
 	      var wid1 = this.$watch(expr1, function (value) {
@@ -1519,11 +2653,11 @@
 	  _walk: function _walk(ast, arg1) {
 	    if (_.typeOf(ast) === 'array') {
 	      var res = [];
-
+	
 	      for (var i = 0, len = ast.length; i < len; i++) {
 	        res.push(this._walk(ast[i], arg1));
 	      }
-
+	
 	      return new Group(res);
 	    }
 	    if (typeof ast === 'string') return doc.createTextNode(ast);
@@ -1538,7 +2672,7 @@
 	        fire = typeof value !== "function" ? _.handleEvent.call(this, value, type) : value,
 	        handler = Component.event(type),
 	        destroy;
-
+	
 	    if (handler) {
 	      destroy = handler.call(this, elem, fire, attrs);
 	    } else {
@@ -1559,7 +2693,7 @@
 	    touched.get = !ext ? rawget : function (context) {
 	      return rawget(context, ext);
 	    };
-
+	
 	    if (expr.setbody && !expr.set) {
 	      var setbody = expr.setbody;
 	      expr.set = function (ctx, value, ext) {
@@ -1609,7 +2743,7 @@
 	        op = op || "=",
 	        prev,
 	        computedProperty = computed ? computed[path] : null;
-
+	
 	    if (op !== '=') {
 	      prev = computedProperty ? computedProperty.get(this) : data[path];
 	      switch (op) {
@@ -1637,18 +2771,18 @@
 	    return value;
 	  }
 	});
-
+	
 	Regular.prototype.inject = function () {
 	  _.log("use $inject instead of inject", "error");
 	  return this.$inject.apply(this, arguments);
 	};
-
+	
 	// only one builtin filter
-
+	
 	Regular.filter(filter);
-
+	
 	module.exports = Regular;
-
+	
 	var handleComputed = (function () {
 	  // wrap the computed getter;
 	  function wrapGet(get) {
@@ -1663,7 +2797,7 @@
 	      return value;
 	    };
 	  }
-
+	
 	  return function (computed) {
 	    if (!computed) return;
 	    var parsedComputed = {},
@@ -1673,7 +2807,7 @@
 	    for (var i in computed) {
 	      handle = computed[i];
 	      type = typeof handle;
-
+	
 	      if (handle.type === 'expression') {
 	        parsedComputed[i] = handle;
 	        continue;
@@ -1695,14 +2829,14 @@
 	})();
 
 /***/ },
-/* 12 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _ = __webpack_require__(5);
-	var config = __webpack_require__(10);
-
+	
+	var _ = __webpack_require__(10);
+	var config = __webpack_require__(15);
+	
 	// some custom tag  will conflict with the Lexer progress
 	var conflictTag = { "}": "{", "]": "[" },
 	    map1,
@@ -1713,26 +2847,26 @@
 	  'IDENT': /[\$_A-Za-z][_0-9A-Za-z\$]*/,
 	  'SPACE': /[\r\n\t\f ]/
 	};
-
+	
 	var test = /a|(b)/.exec("a");
 	var testSubCapure = test && test[1] === undefined ? function (str) {
 	  return str !== undefined;
 	} : function (str) {
 	  return !!str;
 	};
-
+	
 	function wrapHander(handler) {
 	  return function (all) {
 	    return { type: handler, value: all };
 	  };
 	}
-
+	
 	function Lexer(input, opts) {
 	  if (conflictTag[config.END]) {
 	    this.markStart = conflictTag[config.END];
 	    this.markEnd = config.END;
 	  }
-
+	
 	  this.input = (input || "").trim();
 	  this.opts = opts || {};
 	  this.map = this.opts.mode !== 2 ? map1 : map2;
@@ -1742,9 +2876,9 @@
 	    this.expression = true;
 	  }
 	}
-
+	
 	var lo = Lexer.prototype;
-
+	
 	lo.lex = function (str) {
 	  str = (str || this.input).trim();
 	  var tokens = [],
@@ -1772,22 +2906,22 @@
 	    this.index += mlen;
 	    // if(state == 'TAG' || state == 'JST') str = this.skipspace(str);
 	  }
-
+	
 	  tokens.push({ type: 'EOF' });
-
+	
 	  return tokens;
 	};
-
+	
 	lo.error = function (msg) {
 	  throw Error("Parse Error: " + msg + ':\n' + _.trackErrorPos(this.input, this.index));
 	};
-
+	
 	lo._process = function (args, split, str) {
 	  // console.log(args.join(","), this.state())
 	  var links = split.links,
 	      marched = false,
 	      token;
-
+	
 	  for (var len = links.length, i = 0; i < len; i++) {
 	    var link = links[i],
 	        handler = link[2],
@@ -1819,17 +2953,17 @@
 	  this.states.push(state);
 	  return this;
 	};
-
+	
 	lo.state = function () {
 	  var states = this.states;
 	  return states[states.length - 1];
 	};
-
+	
 	lo.leave = function (state) {
 	  var states = this.states;
 	  if (!state || states[states.length - 1] === state) states.pop();
 	};
-
+	
 	Lexer.setup = function () {
 	  macro.END = config.END;
 	  macro.BEGIN = config.BEGIN;
@@ -1837,13 +2971,13 @@
 	  map1 = genMap([
 	  // INIT
 	  rules.ENTER_JST, rules.ENTER_TAG, rules.TEXT,
-
+	
 	  //TAG
 	  rules.TAG_NAME, rules.TAG_OPEN, rules.TAG_CLOSE, rules.TAG_PUNCHOR, rules.TAG_ENTER_JST, rules.TAG_UNQ_VALUE, rules.TAG_STRING, rules.TAG_SPACE, rules.TAG_COMMENT,
-
+	
 	  // JST
 	  rules.JST_OPEN, rules.JST_CLOSE, rules.JST_COMMENT, rules.JST_EXPR_OPEN, rules.JST_IDENT, rules.JST_SPACE, rules.JST_LEAVE, rules.JST_NUMBER, rules.JST_PUNCHOR, rules.JST_STRING, rules.JST_COMMENT]);
-
+	
 	  // ignored the tag-relative token
 	  map2 = genMap([
 	  // INIT no < restrict
@@ -1851,7 +2985,7 @@
 	  // JST
 	  rules.JST_COMMENT, rules.JST_OPEN, rules.JST_CLOSE, rules.JST_EXPR_OPEN, rules.JST_IDENT, rules.JST_SPACE, rules.JST_LEAVE, rules.JST_NUMBER, rules.JST_PUNCHOR, rules.JST_STRING, rules.JST_COMMENT]);
 	};
-
+	
 	function genMap(rules) {
 	  var rule,
 	      map = {},
@@ -1863,30 +2997,30 @@
 	  }
 	  return setup(map);
 	}
-
+	
 	function setup(map) {
 	  var split, rules, trunks, handler, reg, retain, rule;
 	  function replaceFn(all, one) {
 	    return typeof macro[one] === 'string' ? _.escapeRegExp(macro[one]) : String(macro[one]).slice(1, -1);
 	  }
-
+	
 	  for (var i in map) {
-
+	
 	    split = map[i];
 	    split.curIndex = 1;
 	    rules = split.rules;
 	    trunks = [];
-
+	
 	    for (var j = 0, len = rules.length; j < len; j++) {
 	      rule = rules[j];
 	      reg = rule[0];
 	      handler = rule[1];
-
+	
 	      if (typeof handler === 'string') {
 	        handler = wrapHander(handler);
 	      }
 	      if (_.typeOf(reg) === 'regexp') reg = reg.toString().slice(1, -1);
-
+	
 	      reg = reg.replace(/\{(\w+)\}/g, replaceFn);
 	      retain = _.findSubCapture(reg) + 1;
 	      split.links.push([split.curIndex, retain, handler]);
@@ -1897,36 +3031,36 @@
 	  }
 	  return map;
 	}
-
+	
 	var rules = {
-
+	
 	  // 1. INIT
 	  // ---------------
-
+	
 	  // mode1's JST ENTER RULE
 	  ENTER_JST: [/[^\x00<]*?(?={BEGIN})/, function (all) {
 	    this.enter('JST');
 	    if (all) return { type: 'TEXT', value: all };
 	  }],
-
+	
 	  // mode2's JST ENTER RULE
 	  ENTER_JST2: [/[^\x00]*?(?={BEGIN})/, function (all) {
 	    this.enter('JST');
 	    if (all) return { type: 'TEXT', value: all };
 	  }],
-
+	
 	  ENTER_TAG: [/[^\x00]*?(?=<[\w\/\!])/, function (all) {
 	    this.enter('TAG');
 	    if (all) return { type: 'TEXT', value: all };
 	  }],
-
+	
 	  TEXT: [/[^\x00]+/, 'TEXT'],
-
+	
 	  // 2. TAG
 	  // --------------------
 	  TAG_NAME: [/{NAME}/, 'NAME', 'TAG'],
 	  TAG_UNQ_VALUE: [/[^\{}&"'=><`\r\n\f\t ]+/, 'UNQ', 'TAG'],
-
+	
 	  TAG_OPEN: [/<({NAME})\s*/, function (all, one) {
 	    //"
 	    return { type: 'TAG_OPEN', value: one };
@@ -1935,31 +3069,31 @@
 	    this.leave();
 	    return { type: 'TAG_CLOSE', value: one };
 	  }, 'TAG'],
-
+	
 	  // mode2's JST ENTER RULE
 	  TAG_ENTER_JST: [/(?={BEGIN})/, function () {
 	    this.enter('JST');
 	  }, 'TAG'],
-
+	
 	  TAG_PUNCHOR: [/[\>\/=&]/, function (all) {
 	    if (all === '>') this.leave();
 	    return { type: all, value: all };
 	  }, 'TAG'],
 	  TAG_STRING: [/'([^']*)'|"([^"]*)\"/, /*'*/function (all, one, two) {
 	    var value = one || two || "";
-
+	
 	    return { type: 'STRING', value: value };
 	  }, 'TAG'],
-
+	
 	  TAG_SPACE: [/{SPACE}+/, null, 'TAG'],
 	  TAG_COMMENT: [/<\!--([^\x00]*?)--\>/, function (all) {
 	    this.leave();
 	    // this.leave('TAG')
 	  }, 'TAG'],
-
+	
 	  // 3. JST
 	  // -------------------
-
+	
 	  JST_OPEN: ['{BEGIN}#{SPACE}*({IDENT})', function (all, name) {
 	    return {
 	      type: 'OPEN',
@@ -2008,7 +3142,7 @@
 	  JST_PUNCHOR: [/[=!]?==|[-=><+*\/%\!]?\=|\|\||&&|\@\(|\.\.|[<\>\[\]\(\)\-\|\{}\+\*\/%?:\.!,]/, function (all) {
 	    return { type: all, value: all };
 	  }, 'JST'],
-
+	
 	  JST_STRING: [/'([^']*)'|"([^"]*)"/, function (all, one, two) {
 	    //"'
 	    return { type: 'STRING', value: one || two || "" };
@@ -2017,40 +3151,40 @@
 	    return { type: 'NUMBER', value: parseFloat(all, 10) };
 	  }, 'JST']
 	};
-
+	
 	// setup when first config
 	Lexer.setup();
-
+	
 	module.exports = Lexer;
 
 /***/ },
-/* 13 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _ = __webpack_require__(5);
-
-	var config = __webpack_require__(10);
-	var node = __webpack_require__(14);
-	var Lexer = __webpack_require__(12);
+	
+	var _ = __webpack_require__(10);
+	
+	var config = __webpack_require__(15);
+	var node = __webpack_require__(19);
+	var Lexer = __webpack_require__(17);
 	var varName = _.varName;
 	var ctxName = _.ctxName;
 	var extName = _.extName;
 	var isPath = _.makePredicate("STRING IDENT NUMBER");
 	var isKeyWord = _.makePredicate("true false undefined null this Array Date JSON Math NaN RegExp decodeURI decodeURIComponent encodeURI encodeURIComponent parseFloat parseInt Object");
-
+	
 	function Parser(input, opts) {
 	  opts = opts || {};
-
+	
 	  this.input = input;
 	  this.tokens = new Lexer(input, opts).lex();
 	  this.pos = 0;
 	  this.length = this.tokens.length;
 	}
-
+	
 	var op = Parser.prototype;
-
+	
 	op.parse = function () {
 	  this.pos = 0;
 	  var res = this.program();
@@ -2059,7 +3193,7 @@
 	  }
 	  return res;
 	};
-
+	
 	op.ll = function (k) {
 	  k = k || 1;
 	  if (k < 0) k = k + 1;
@@ -2073,7 +3207,7 @@
 	op.la = function (k) {
 	  return (this.ll(k) || '').type;
 	};
-
+	
 	op.match = function (type, value) {
 	  var ll;
 	  if (!(ll = this.eat(type, value))) {
@@ -2083,12 +3217,12 @@
 	    return ll;
 	  }
 	};
-
+	
 	op.error = function (msg, pos) {
 	  msg = "\n【 parse failed 】 " + msg + ':\n\n' + _.trackErrorPos(this.input, typeof pos === 'number' ? pos : this.ll().pos || 0);
 	  throw new Error(msg);
 	};
-
+	
 	op.next = function (k) {
 	  k = k || 1;
 	  this.pos += k;
@@ -2110,7 +3244,7 @@
 	  }
 	  return false;
 	};
-
+	
 	// program
 	//  :EOF
 	//  | (statement)* EOF
@@ -2118,14 +3252,14 @@
 	  var statements = [],
 	      ll = this.ll();
 	  while (ll.type !== 'EOF' && ll.type !== 'TAG_CLOSE') {
-
+	
 	    statements.push(this.statement());
 	    ll = this.ll();
 	  }
 	  // if(ll.type === 'TAG_CLOSE') this.error("You may have unmatched Tag")
 	  return statements;
 	};
-
+	
 	// statement
 	//  : xml
 	//  | jst
@@ -2151,7 +3285,7 @@
 	      this.error('Unexpected token: ' + this.la());
 	  }
 	};
-
+	
 	// xml
 	// stag statement* TAG_CLOSE?(if self-closed tag)
 	op.xml = function () {
@@ -2166,7 +3300,7 @@
 	  }
 	  return node.element(name, attrs, children);
 	};
-
+	
 	// xentity
 	//  -rule(wrap attribute)
 	//  -attribute
@@ -2176,7 +3310,7 @@
 	//  ng-hide |
 	//  on-click={{}} |
 	//  {{#if name}}on-click={{xx}}{{#else}}on-tap={{}}{{/if}}
-
+	
 	op.xentity = function (ll) {
 	  var name = ll.value,
 	      value,
@@ -2195,7 +3329,7 @@
 	    return this['if'](true);
 	  }
 	};
-
+	
 	// stag     ::=    '<' Name (S attr)* S? '>' 
 	// attr    ::=     Name Eq attvalue
 	op.attrs = function (isAttribute) {
@@ -2205,7 +3339,7 @@
 	  } else {
 	    eat = ["NAME"];
 	  }
-
+	
 	  var attrs = [],
 	      ll;
 	  while (ll = this.eat(eat)) {
@@ -2213,7 +3347,7 @@
 	  }
 	  return attrs;
 	};
-
+	
 	// attvalue
 	//  : STRING 
 	//  | NAME
@@ -2253,7 +3387,7 @@
 	      this.error('Unexpected token: ' + this.la());
 	  }
 	};
-
+	
 	// {{#}}
 	op.directive = function () {
 	  var name = this.ll().value;
@@ -2264,7 +3398,7 @@
 	    this.error('Undefined directive[' + name + ']');
 	  }
 	};
-
+	
 	// {{}}
 	op.interplation = function () {
 	  this.match('EXPR_OPEN');
@@ -2272,25 +3406,25 @@
 	  this.match('END');
 	  return res;
 	};
-
+	
 	// {{~}}
 	op.inc = op.include = function () {
 	  var content = this.expression();
 	  this.match('END');
 	  return node.template(content);
 	};
-
+	
 	// {{#if}}
 	op["if"] = function (tag) {
 	  var test = this.expression();
 	  var consequent = [],
 	      alternate = [];
-
+	
 	  var container = consequent;
 	  var statement = !tag ? "statement" : "attrs";
-
+	
 	  this.match('END');
-
+	
 	  var ll, close;
 	  while (!(close = this.eat('CLOSE'))) {
 	    ll = this.ll();
@@ -2316,7 +3450,7 @@
 	  if (close.value !== "if") this.error('Unmatched if directive');
 	  return node["if"](test, consequent, alternate);
 	};
-
+	
 	// @mark   mustache syntax have natrure dis, canot with expression
 	// {{#list}}
 	op.list = function () {
@@ -2328,11 +3462,11 @@
 	  var consequent = [],
 	      alternate = [];
 	  var container = consequent;
-
+	
 	  this.match('IDENT', 'as');
-
+	
 	  variable = this.match('IDENT').value;
-
+	
 	  if (this.eat('IDENT', 'by')) {
 	    if (this.eat('IDENT', variable + '_index')) {
 	      track = true;
@@ -2344,9 +3478,9 @@
 	      }
 	    }
 	  }
-
+	
 	  this.match('END');
-
+	
 	  while (!(ll = this.eat('CLOSE'))) {
 	    if (this.eat('OPEN', 'else')) {
 	      container = alternate;
@@ -2355,11 +3489,11 @@
 	      container.push(this.statement());
 	    }
 	  }
-
+	
 	  if (ll.value !== 'list') this.error('expect ' + 'list got ' + '/' + ll.value + ' ', ll.pos);
 	  return node.list(sequence, variable, consequent, alternate, track);
 	};
-
+	
 	op.expression = function () {
 	  var expression;
 	  if (this.eat('@(')) {
@@ -2372,17 +3506,17 @@
 	  }
 	  return expression;
 	};
-
+	
 	op.expr = function () {
 	  this.depend = [];
-
+	
 	  var buffer = this.filter();
-
+	
 	  var body = buffer.get || buffer;
 	  var setbody = buffer.set;
 	  return node.expression(body, setbody, !this.depend.length);
 	};
-
+	
 	// filter
 	// assign ('|' filtername[':' args]) *
 	op.filter = function () {
@@ -2395,12 +3529,12 @@
 	      set = left.set,
 	      get,
 	      tmp = "";
-
+	
 	  if (ll) {
 	    if (set) setBuffer = [];
-
+	
 	    prefix = "(function(" + attr + "){";
-
+	
 	    do {
 	      tmp = attr + " = " + ctxName + "._f_('" + this.match('IDENT').value + "' ).get.call( " + _.ctxName + "," + attr;
 	      if (this.eat(':')) {
@@ -2413,7 +3547,7 @@
 	    } while (ll = this.eat('|'));
 	    buffer.push("return " + attr);
 	    setBuffer && setBuffer.push("return " + attr);
-
+	
 	    get = prefix + buffer.join("") + "})(" + left.get + ")";
 	    // we call back to value.
 	    if (setBuffer) {
@@ -2425,7 +3559,7 @@
 	  }
 	  return left;
 	};
-
+	
 	// assign
 	// left-hand-expr = condition
 	op.assign = function () {
@@ -2438,37 +3572,37 @@
 	  }
 	  return left;
 	};
-
+	
 	// or
 	// or ? assign : assign
 	op.condition = function () {
-
+	
 	  var test = this.or();
 	  if (this.eat('?')) {
 	    return this.getset([test.get + "?", this.assign().get, this.match(":").type, this.assign().get].join(""));
 	  }
-
+	
 	  return test;
 	};
-
+	
 	// and
 	// and && or
 	op.or = function () {
-
+	
 	  var left = this.and();
-
+	
 	  if (this.eat('||')) {
 	    return this.getset(left.get + '||' + this.or().get);
 	  }
-
+	
 	  return left;
 	};
 	// equal
 	// equal && and
 	op.and = function () {
-
+	
 	  var left = this.equal();
-
+	
 	  if (this.eat('&&')) {
 	    return this.getset(left.get + '&&' + this.and().get);
 	  }
@@ -2528,21 +3662,21 @@
 	  }
 	  return left;
 	};
-
+	
 	op.range = function () {
 	  var left = this.unary(),
 	      ll,
 	      right;
-
+	
 	  if (ll = this.eat('..')) {
 	    right = this.unary();
 	    var body = "(function(start,end){var res = [],step=end>start?1:-1; for(var i = start; end>start?i <= end: i>=end; i=i+step){res.push(i); } return res })(" + left.get + "," + right.get + ")";
 	    return this.getset(body);
 	  }
-
+	
 	  return left;
 	};
-
+	
 	// lefthand
 	// + unary
 	// - unary
@@ -2556,15 +3690,15 @@
 	    return this.member();
 	  }
 	};
-
+	
 	// call[lefthand] :
 	// member args
 	// member [ expression ]
 	// member . ident 
-
+	
 	op.member = function (base, last, pathes, prevBase) {
 	  var ll, path, extValue;
-
+	
 	  var onlySimpleAccessor = false;
 	  if (!base) {
 	    //first
@@ -2637,7 +3771,7 @@
 	  }
 	  return res;
 	};
-
+	
 	/**
 	 * 
 	 */
@@ -2651,7 +3785,7 @@
 	  } while (this.eat(','));
 	  return args;
 	};
-
+	
 	// primary :
 	// this
 	// ident
@@ -2659,7 +3793,7 @@
 	// array
 	// object
 	// ( expression )
-
+	
 	op.primary = function () {
 	  var ll = this.ll();
 	  switch (ll.type) {
@@ -2686,21 +3820,21 @@
 	      this.error('Unexpected Token: ' + ll.type);
 	  }
 	};
-
+	
 	// object
 	//  {propAssign [, propAssign] * [,]}
-
+	
 	// propAssign
 	//  prop : assign
-
+	
 	// prop
 	//  STRING
 	//  IDENT
 	//  NUMBER
-
+	
 	op.object = function () {
 	  var code = [this.match('{').type];
-
+	
 	  var ll = this.eat(['STRING', 'IDENT', 'NUMBER']);
 	  while (ll) {
 	    code.push("'" + ll.value + "'" + this.match(':').type);
@@ -2712,14 +3846,14 @@
 	  code.push(this.match('}').type);
 	  return { get: code.join("") };
 	};
-
+	
 	// array
 	// [ assign[,assign]*]
 	op.array = function () {
 	  var code = [this.match('[').type],
 	      item;
 	  if (this.eat("]")) {
-
+	
 	    code.push("]");
 	  } else {
 	    while (item = this.assign()) {
@@ -2730,7 +3864,7 @@
 	  }
 	  return { get: code.join("") };
 	};
-
+	
 	// '(' expression ')'
 	op.paren = function () {
 	  this.match('(');
@@ -2739,22 +3873,22 @@
 	  this.match(')');
 	  return res;
 	};
-
+	
 	op.getset = function (get, set) {
 	  return {
 	    get: get,
 	    set: set
 	  };
 	};
-
+	
 	module.exports = Parser;
 
 /***/ },
-/* 14 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
-
+	
 	module.exports = {
 	  element: function element(name, attrs, children) {
 	    return {
@@ -2813,29 +3947,29 @@
 	};
 
 /***/ },
-/* 15 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	// Backbone may be freely distributed under the MIT license.
 	// For all details and documentation:
 	// http://backbonejs.org
-
+	
 	// klass: a classical JS OOP façade
 	// https://github.com/ded/klass
 	// License MIT (c) Dustin Diaz 2014
-
+	
 	// inspired by backbone's extend and klass
 	"use strict";
-
-	var _ = __webpack_require__(5),
+	
+	var _ = __webpack_require__(10),
 	    fnTest = /xy/.test(function () {
 	  "xy";
 	}) ? /\bsupr\b/ : /.*/,
 	    isFn = function isFn(o) {
 	  return typeof o === "function";
 	};
-
+	
 	function wrap(k, fn, supro) {
 	  return function () {
 	    var tmp = this.supr;
@@ -2845,16 +3979,16 @@
 	    return ret;
 	  };
 	}
-
+	
 	function process(what, o, supro) {
 	  for (var k in o) {
 	    if (o.hasOwnProperty(k)) {
-
+	
 	      what[k] = isFn(o[k]) && isFn(supro[k]) && fnTest.test(o[k]) ? wrap(k, o[k], supro) : o[k];
 	    }
 	  }
 	}
-
+	
 	// if the property is ["events", "data", "computed"] , we should merge them
 	var merged = ["events", "data", "computed"],
 	    mlen = merged.length;
@@ -2863,20 +3997,20 @@
 	  var supr = this,
 	      proto,
 	      supro = supr && supr.prototype || {};
-
+	
 	  if (typeof o === 'function') {
 	    proto = o.prototype;
 	    o.implement = implement;
 	    o.extend = extend;
 	    return o;
 	  }
-
+	
 	  function fn() {
 	    supr.apply(this, arguments);
 	  }
-
+	
 	  proto = _.createProto(fn, supro);
-
+	
 	  function implement(o) {
 	    // we need merge the merged property
 	    var len = mlen;
@@ -2887,11 +4021,11 @@
 	        delete o[prop];
 	      }
 	    }
-
+	
 	    process(proto, o, supro);
 	    return this;
 	  }
-
+	
 	  fn.implement = implement;
 	  fn.implement(o);
 	  if (supr.__after__) supr.__after__.call(fn, supr, o);
@@ -2900,46 +4034,46 @@
 	};
 
 /***/ },
-/* 16 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
 	// thanks for angular && mootools for some concise&cross-platform  implemention
 	// =====================================
-
+	
 	// The MIT License
 	// Copyright (c) 2010-2014 Google, Inc. http://angularjs.org
-
+	
 	// ---
 	// license: MIT-style license. http://mootools.net
-
+	
 	"use strict";
-
+	
 	var dom = module.exports;
-	var env = __webpack_require__(4);
-	var _ = __webpack_require__(5);
+	var env = __webpack_require__(9);
+	var _ = __webpack_require__(10);
 	var tNode = document.createElement('div');
 	var addEvent, removeEvent;
 	var noop = function noop() {};
-
+	
 	var namespaces = {
 	  html: "http://www.w3.org/1999/xhtml",
 	  svg: "http://www.w3.org/2000/svg"
 	};
-
+	
 	dom.body = document.body;
-
+	
 	dom.doc = document;
-
+	
 	// camelCase
 	function camelCase(str) {
 	  return ("" + str).replace(/-\D/g, function (match) {
 	    return match.charAt(1).toUpperCase();
 	  });
 	}
-
+	
 	dom.tNode = tNode;
-
+	
 	if (tNode.addEventListener) {
 	  addEvent = function (node, type, fn) {
 	    node.addEventListener(type, fn, false);
@@ -2955,12 +4089,12 @@
 	    node.detachEvent('on' + type, fn);
 	  };
 	}
-
+	
 	dom.msie = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
 	if (isNaN(dom.msie)) {
 	  dom.msie = parseInt((/trident\/.*; rv:(\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
 	}
-
+	
 	dom.find = function (sl) {
 	  if (document.querySelector) {
 	    try {
@@ -2969,9 +4103,9 @@
 	  }
 	  if (sl.indexOf('#') !== -1) return document.getElementById(sl.slice(1));
 	};
-
+	
 	dom.inject = function (node, refer, position) {
-
+	
 	  position = position || 'bottom';
 	  if (!node) return;
 	  if (Array.isArray(node)) {
@@ -2981,7 +4115,7 @@
 	      node.appendChild(tmp[i]);
 	    }
 	  }
-
+	
 	  var firstChild, next;
 	  switch (position) {
 	    case 'bottom':
@@ -3005,11 +4139,11 @@
 	      refer.parentNode.insertBefore(node, refer);
 	  }
 	};
-
+	
 	dom.id = function (id) {
 	  return document.getElementById(id);
 	};
-
+	
 	// createElement
 	dom.create = function (type, ns, attrs) {
 	  if (ns === 'svg') {
@@ -3018,12 +4152,12 @@
 	  }
 	  return !ns ? document.createElement(type) : document.createElementNS(ns, type);
 	};
-
+	
 	// documentFragment
 	dom.fragment = function () {
 	  return document.createDocumentFragment();
 	};
-
+	
 	var specialAttr = {
 	  'class': function _class(node, value) {
 	    'className' in node && (node.namespaceURI === namespaces.html || !node.namespaceURI) ? node.className = value || '' : node.setAttribute('class', value);
@@ -3038,7 +4172,7 @@
 	    node.value = _value != null ? _value : '';
 	  }
 	};
-
+	
 	// attribute Setter & Getter
 	dom.attr = function (node, name, value) {
 	  if (_.isBooleanAttr(name)) {
@@ -3067,7 +4201,7 @@
 	    return ret === null ? undefined : ret;
 	  }
 	};
-
+	
 	dom.on = function (node, type, handler) {
 	  var types = type.split(' ');
 	  handler.real = function (ev) {
@@ -3088,7 +4222,7 @@
 	    removeEvent(node, type, handler);
 	  });
 	};
-
+	
 	dom.text = (function () {
 	  var map = {};
 	  if (dom.msie && dom.msie < 9) {
@@ -3097,7 +4231,7 @@
 	  } else {
 	    map[1] = map[3] = 'textContent';
 	  }
-
+	
 	  return function (node, value) {
 	    var textProp = map[node.nodeType];
 	    if (value == null) {
@@ -3106,7 +4240,7 @@
 	    node[textProp] = value;
 	  };
 	})();
-
+	
 	dom.html = function (node, html) {
 	  if (typeof html === "undefined") {
 	    return node.innerHTML;
@@ -3114,15 +4248,15 @@
 	    node.innerHTML = html;
 	  }
 	};
-
+	
 	dom.replace = function (node, replaced) {
 	  if (replaced.parentNode) replaced.parentNode.replaceChild(node, replaced);
 	};
-
+	
 	dom.remove = function (node) {
 	  if (node.parentNode) node.parentNode.removeChild(node);
 	};
-
+	
 	// css Settle & Getter from angular
 	// =================================
 	// it isnt computed style
@@ -3136,11 +4270,11 @@
 	    return;
 	  }
 	  if (typeof value !== "undefined") {
-
+	
 	    name = camelCase(name);
 	    if (name) node.style[name] = value;
 	  } else {
-
+	
 	    var val;
 	    if (dom.msie <= 8) {
 	      // this is some IE specific weirdness that jQuery 1.6.4 does not sure why
@@ -3154,31 +4288,31 @@
 	    return val;
 	  }
 	};
-
+	
 	dom.addClass = function (node, className) {
 	  var current = node.className || "";
 	  if ((" " + current + " ").indexOf(" " + className + " ") === -1) {
 	    node.className = current ? current + " " + className : className;
 	  }
 	};
-
+	
 	dom.delClass = function (node, className) {
 	  var current = node.className || "";
 	  node.className = (" " + current + " ").replace(" " + className + " ", " ").trim();
 	};
-
+	
 	dom.hasClass = function (node, className) {
 	  var current = node.className || "";
 	  return (" " + current + " ").indexOf(" " + className + " ") !== -1;
 	};
-
+	
 	// simple Event wrap
-
+	
 	//http://stackoverflow.com/questions/11068196/ie8-ie7-onchange-event-is-emited-only-after-repeated-selection
 	function fixEventName(elem, name) {
 	  return name === 'change' && dom.msie < 9 && elem && elem.tagName && elem.tagName.toLowerCase() === 'input' && (elem.type === 'checkbox' || elem.type === 'radio') ? 'click' : name;
 	}
-
+	
 	var rMouseEvent = /^(?:click|dblclick|contextmenu|DOMMouseScroll|mouse(?:\w+))$/;
 	var doc = document;
 	doc = !doc.compatMode || doc.compatMode === 'CSS1Compat' ? doc.documentElement : doc.body;
@@ -3187,10 +4321,10 @@
 	  if (ev._fixed) return ev;
 	  this.event = ev;
 	  this.target = ev.target || ev.srcElement;
-
+	
 	  var type = this.type = ev.type;
 	  var button = this.button = ev.button;
-
+	
 	  // if is mouse event patch pageX
 	  if (rMouseEvent.test(type)) {
 	    //fix pageX
@@ -3208,7 +4342,7 @@
 	    // ff ev.detail: 3    other ev.wheelDelta: -120
 	    this.wheelDelta = ev.wheelDelta ? ev.wheelDelta / 120 : -(ev.detail || 0) / 3;
 	  }
-
+	
 	  // fix which
 	  this.which = ev.which || ev.keyCode;
 	  if (!this.which && button !== undefined) {
@@ -3217,7 +4351,7 @@
 	  }
 	  this._fixed = true;
 	}
-
+	
 	_.extend(Event.prototype, {
 	  immediateStop: _.isFalse,
 	  stop: function stop() {
@@ -3235,16 +4369,16 @@
 	    if (this.event.stopImmediatePropagation) this.event.stopImmediatePropagation();
 	  }
 	});
-
+	
 	dom.nextFrame = (function () {
 	  var request = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (callback) {
 	    setTimeout(callback, 16);
 	  };
-
+	
 	  var cancel = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelRequestAnimationFrame || function (tid) {
 	    clearTimeout(tid);
 	  };
-
+	
 	  return function (callback) {
 	    var id = request(callback);
 	    return function () {
@@ -3252,7 +4386,7 @@
 	    };
 	  };
 	})();
-
+	
 	// 3ks for angular's raf  service
 	var k;
 	dom.nextReflow = dom.msie ? function (callback) {
@@ -3263,23 +4397,23 @@
 	} : dom.nextFrame;
 
 /***/ },
-/* 17 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var diffArray = __webpack_require__(18).diffArray;
-	var combine = __webpack_require__(19);
-	var animate = __webpack_require__(20);
-	var node = __webpack_require__(14);
-	var Group = __webpack_require__(21);
-	var dom = __webpack_require__(16);
-	var _ = __webpack_require__(5);
-
+	
+	var diffArray = __webpack_require__(23).diffArray;
+	var combine = __webpack_require__(24);
+	var animate = __webpack_require__(25);
+	var node = __webpack_require__(19);
+	var Group = __webpack_require__(26);
+	var dom = __webpack_require__(21);
+	var _ = __webpack_require__(10);
+	
 	var walkers = module.exports = {};
-
+	
 	walkers.list = function (ast, options) {
-
+	
 	  var Regular = walkers.Regular;
 	  var placeholder = document.createComment("Regular list"),
 	      namespace = options.namespace,
@@ -3293,7 +4427,7 @@
 	  var track = ast.track,
 	      keyOf,
 	      extraObj;
-
+	
 	  if (track && track !== true) {
 	    track = this._touchExpr(track);
 	    extraObj = _.createObject(extra);
@@ -3304,7 +4438,7 @@
 	      return track.get(self, extraObj);
 	    };
 	  }
-
+	
 	  function removeRange(index, rlen) {
 	    for (var j = 0; j < rlen; j++) {
 	      //removed
@@ -3312,7 +4446,7 @@
 	      if (removed) removed.destroy(true);
 	    }
 	  }
-
+	
 	  function addRange(index, end, newList, rawNewValue) {
 	    for (var o = index; o < end; o++) {
 	      //add
@@ -3320,7 +4454,7 @@
 	      var item = newList[o];
 	      var data = {};
 	      updateTarget(data, o, item, rawNewValue);
-
+	
 	      data = _.createObject(extra, data);
 	      var section = self.$compile(ast.body, {
 	        extra: data,
@@ -3338,9 +4472,9 @@
 	      group.children.splice(o + 1, 0, section);
 	    }
 	  }
-
+	
 	  function updateTarget(target, index, item, rawNewValue) {
-
+	
 	    target[indexName] = index;
 	    if (rawNewValue) {
 	      target[keyName] = item;
@@ -3350,7 +4484,7 @@
 	      target[keyName] = null;
 	    }
 	  }
-
+	
 	  function updateRange(start, end, newList, rawNewValue) {
 	    for (var k = start; k < end; k++) {
 	      // no change
@@ -3359,19 +4493,19 @@
 	      updateTarget(sect.data, k, item, rawNewValue);
 	    }
 	  }
-
+	
 	  function updateLD(newList, oldList, splices, rawNewValue) {
-
+	
 	    var cur = placeholder;
 	    var m = 0,
 	        len = newList.length;
-
+	
 	    if (!splices && (len !== 0 || oldList.length !== 0)) {
 	      splices = diffArray(newList, oldList, true);
 	    }
-
+	
 	    if (!splices || !splices.length) return;
-
+	
 	    for (var i = 0; i < splices.length; i++) {
 	      //init
 	      var splice = splices[i];
@@ -3397,11 +4531,11 @@
 	      }
 	      // update
 	      updateRange(m, index, newList, rawNewValue);
-
+	
 	      removeRange(index, rlen);
-
+	
 	      addRange(index, index + add, newList, rawNewValue);
-
+	
 	      m = index + add - rlen;
 	      m = m < 0 ? 0 : m;
 	    }
@@ -3413,14 +4547,14 @@
 	      }
 	    }
 	  }
-
+	
 	  // if the track is constant test.
 	  function updateSimple(newList, oldList, rawNewValue) {
-
+	
 	    var nlen = newList.length;
 	    var olen = oldList.length;
 	    var mlen = Math.min(nlen, olen);
-
+	
 	    updateRange(0, mlen, newList, rawNewValue);
 	    if (nlen < olen) {
 	      //need add
@@ -3429,34 +4563,34 @@
 	      addRange(olen, nlen, newList, rawNewValue);
 	    }
 	  }
-
+	
 	  function update(newValue, oldValue, splices) {
-
+	
 	    var nType = _.typeOf(newValue);
 	    var oType = _.typeOf(oldValue);
-
+	
 	    var newList = getListFromValue(newValue, nType);
 	    var oldList = getListFromValue(oldValue, oType);
-
+	
 	    var rawNewValue;
-
+	
 	    var nlen = newList && newList.length;
 	    var olen = oldList && oldList.length;
-
+	
 	    // if previous list has , we need to remove the altnated section.
 	    if (!olen && nlen && group.get(1)) {
 	      var altGroup = group.children.pop();
 	      if (altGroup.destroy) altGroup.destroy(true);
 	    }
-
+	
 	    if (nType === 'object') rawNewValue = newValue;
-
+	
 	    if (track === true) {
 	      updateSimple(newList, oldList, rawNewValue);
 	    } else {
 	      updateLD(newList, oldList, splices, rawNewValue);
 	    }
-
+	
 	    // @ {#list} {#else}
 	    if (!nlen && alternate && alternate.length) {
 	      var section = self.$compile(alternate, {
@@ -3471,7 +4605,7 @@
 	      }
 	    }
 	  }
-
+	
 	  this.$watch(ast.sequence, update, {
 	    init: true,
 	    diff: track !== true,
@@ -3479,9 +4613,9 @@
 	  });
 	  return group;
 	};
-
+	
 	function updateItem() {}
-
+	
 	// {#include } or {#inc template}
 	walkers.template = function (ast, options) {
 	  var content = ast.content,
@@ -3501,7 +4635,7 @@
 	        group.children.pop();
 	      }
 	      if (!value) return;
-
+	
 	      group.push(compiled = type === 'function' ? value() : self.$compile(type !== 'object' ? String(value) : value, {
 	        record: true,
 	        outer: options.outer,
@@ -3516,11 +4650,11 @@
 	  }
 	  return group;
 	};
-
+	
 	function getListFromValue(value, type) {
 	  return type === 'object' ? _.keys(value) : type === 'array' ? value : [];
 	}
-
+	
 	// how to resolve this problem
 	var ii = 0;
 	walkers['if'] = function (ast, options) {
@@ -3546,14 +4680,14 @@
 	      }
 	    };
 	  }
-
+	
 	  var test, consequent, alternate, node;
 	  var placeholder = document.createComment("Regular if" + ii++);
 	  var group = new Group();
 	  group.push(placeholder);
 	  var preValue = null,
 	      namespace = options.namespace;
-
+	
 	  var update = function update(nvalue, old) {
 	    var value = !!nvalue;
 	    if (value === preValue) return;
@@ -3584,10 +4718,10 @@
 	    }
 	  };
 	  this.$watch(ast.test, update, { force: true, init: true });
-
+	
 	  return group;
 	};
-
+	
 	walkers.expression = function (ast, options) {
 	  var node = document.createTextNode("");
 	  this.$watch(ast, function (newval) {
@@ -3599,9 +4733,9 @@
 	  var node = document.createTextNode(_.convertEntity(ast.text));
 	  return node;
 	};
-
+	
 	var eventReg = /^on-(.+)$/;
-
+	
 	/**
 	 * walkers element (contains component)
 	 */
@@ -3617,30 +4751,30 @@
 	      ref,
 	      group,
 	      element;
-
+	
 	  if (tag === 'r-content') {
 	    _.log('r-content is deprecated, use {#inc this.$body} instead (`{#include}` as same)', 'warn');
 	    return this.$body && this.$body();
 	  }
-
+	
 	  if (Component || tag === 'r-component') {
 	    options.Component = Component;
 	    return walkers.component.call(this, ast, options);
 	  }
-
+	
 	  if (tag === 'svg') namespace = "svg";
 	  // @Deprecated: may be removed in next version, use {#inc } instead
-
+	
 	  if (children && children.length) {
 	    group = this.$compile(children, { outer: options.outer, namespace: namespace, extra: extra });
 	  }
-
+	
 	  element = dom.create(tag, namespace, attrs);
-
+	
 	  if (group && !_.isVoidTag(tag)) {
 	    dom.inject(combine.node(group), element);
 	  }
-
+	
 	  // sort before
 	  if (!ast.touched) {
 	    attrs.sort(function (a1, a2) {
@@ -3656,7 +4790,7 @@
 	  }
 	  // may distinct with if else
 	  var destroies = walkAttributes.call(this, attrs, element, extra);
-
+	
 	  return {
 	    type: "element",
 	    group: group,
@@ -3687,7 +4821,7 @@
 	    }
 	  };
 	};
-
+	
 	walkers.component = function (ast, options) {
 	  var attrs = ast.attrs,
 	      Component = options.Component,
@@ -3698,10 +4832,10 @@
 	      ref,
 	      self = this,
 	      is;
-
+	
 	  var data = {},
 	      events;
-
+	
 	  for (var i = 0, len = attrs.length; i < len; i++) {
 	    var attr = attrs[i];
 	    // consider disabled   equlasto  disabled={true}
@@ -3716,7 +4850,7 @@
 	      // event: 'nav'
 	      if (etest) attr.event = etest[1];
 	    }
-
+	
 	    // @compile modifier
 	    if (attr.mdf === 'cmpl') {
 	      value = _.getCompileFn(value, this, {
@@ -3726,7 +4860,7 @@
 	        outer: options.outer
 	      });
 	    }
-
+	
 	    // @if is r-component . we need to find the target Component
 	    if (name === 'is' && !Component) {
 	      is = value;
@@ -3743,7 +4877,7 @@
 	    } else {
 	      name = attr.name = _.camelCase(name);
 	    }
-
+	
 	    if (value.type !== 'expression') {
 	      data[name] = value;
 	    } else {
@@ -3761,7 +4895,7 @@
 	      data.isolate = isolate;
 	    }
 	  }
-
+	
 	  var definition = {
 	    data: data,
 	    events: events,
@@ -3777,10 +4911,10 @@
 	    namespace: namespace,
 	    extra: options.extra
 	  };
-
+	
 	  var component = new Component(definition, options),
 	      reflink;
-
+	
 	  if (ref && this.$refs) {
 	    reflink = Component.directive('ref').link;
 	    this.$on('$destroy', reflink.call(this, component, ref));
@@ -3823,7 +4957,7 @@
 	  }
 	  return component;
 	};
-
+	
 	function walkAttributes(attrs, element, extra) {
 	  var bindings = [];
 	  for (var i = 0, len = attrs.length; i < len; i++) {
@@ -3832,9 +4966,9 @@
 	  }
 	  return bindings;
 	}
-
+	
 	walkers.attribute = function (ast, options) {
-
+	
 	  var attr = ast;
 	  var name = attr.name;
 	  var value = attr.value || "";
@@ -3843,11 +4977,11 @@
 	  var directive = Component.directive(name);
 	  var element = options.element;
 	  var self = this;
-
+	
 	  value = this._touchExpr(value);
-
+	
 	  if (constant) value = value.get(this);
-
+	
 	  if (directive && directive.link) {
 	    var binding = directive.link.call(self, element, value, name, options.attrs);
 	    if (typeof binding === 'function') binding = { destroy: binding };
@@ -3875,13 +5009,13 @@
 	};
 
 /***/ },
-/* 18 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var _ = __webpack_require__(5);
-
+	
+	var _ = __webpack_require__(10);
+	
 	function simpleDiff(now, old) {
 	  var nlen = now.length;
 	  var olen = old.length;
@@ -3893,11 +5027,11 @@
 	  }
 	  return false;
 	}
-
+	
 	function equals(a, b) {
 	  return a === b;
 	}
-
+	
 	// array1 - old array
 	// array2 - new array
 	function ld(array1, array2, equalFn) {
@@ -3951,9 +5085,9 @@
 	    var northWest = matrix[i - 1][j - 1];
 	    var west = matrix[i - 1][j];
 	    var north = matrix[i][j - 1];
-
+	
 	    var min = Math.min(north, west, northWest);
-
+	
 	    if (min === west) {
 	      edits.unshift(2); //delete
 	      i--;
@@ -3980,7 +5114,7 @@
 	  var n = 0;m = 0;
 	  var steps = [];
 	  var step = { index: null, add: 0, removed: [] };
-
+	
 	  for (var i = 0; i < edits.length; i++) {
 	    if (edits[i] > 0) {
 	      // NOT LEAVE
@@ -4020,26 +5154,26 @@
 	  }
 	  return steps;
 	}
-
+	
 	// diffObject
 	// ----
 	// test if obj1 deepEqual obj2
 	function diffObject(now, last, diff) {
-
+	
 	  if (!diff) {
-
+	
 	    for (var j in now) {
 	      if (last[j] !== now[j]) return true;
 	    }
-
+	
 	    for (var n in last) {
 	      if (last[n] !== now[n]) return true;
 	    }
 	  } else {
-
+	
 	    var nKeys = _.keys(now);
 	    var lKeys = _.keys(last);
-
+	
 	    /**
 	     * [description]
 	     * @param  {[type]} a    [description]
@@ -4050,29 +5184,29 @@
 	      return now[b] === last[a];
 	    });
 	  }
-
+	
 	  return false;
 	}
-
+	
 	module.exports = {
 	  diffArray: diffArray,
 	  diffObject: diffObject
 	};
 
 /***/ },
-/* 19 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// some nested  operation in ast
 	// --------------------------------
-
+	
 	"use strict";
-
-	var dom = __webpack_require__(16);
-	var animate = __webpack_require__(20);
-
+	
+	var dom = __webpack_require__(21);
+	var animate = __webpack_require__(25);
+	
 	var combine = module.exports = {
-
+	
 	  // get the initial dom in object
 	  node: function node(item) {
 	    var children, node, nodes;
@@ -4120,18 +5254,18 @@
 	    }
 	    return group;
 	  },
-
+	
 	  // get the last dom in object(for insertion operation)
 	  last: function last(item) {
 	    var children = item.children;
-
+	
 	    if (typeof item.last === "function") return item.last();
 	    if (typeof item.nodeType === "number") return item;
-
+	
 	    if (children && children.length) return combine.last(children[children.length - 1]);
 	    if (item.group) return combine.last(item.group);
 	  },
-
+	
 	  destroy: function destroy(item, first) {
 	    if (!item) return;
 	    if (Array.isArray(item)) {
@@ -4147,9 +5281,9 @@
 	      item.children = null;
 	    }
 	  }
-
+	
 	};
-
+	
 	// @TODO: need move to dom.js
 	dom.element = function (component, all) {
 	  if (!component) return !all ? null : [];
@@ -4167,29 +5301,29 @@
 	};
 
 /***/ },
-/* 20 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _ = __webpack_require__(5);
-	var dom = __webpack_require__(16);
+	
+	var _ = __webpack_require__(10);
+	var dom = __webpack_require__(21);
 	var animate = {};
-	var env = __webpack_require__(4);
-
+	var env = __webpack_require__(9);
+	
 	var transitionEnd = 'transitionend',
 	    animationEnd = 'animationend',
 	    transitionProperty = 'transition',
 	    animationProperty = 'animation';
-
+	
 	if (!('ontransitionend' in window)) {
 	  if ('onwebkittransitionend' in window) {
-
+	
 	    // Chrome/Saf (+ Mobile Saf)/Android
 	    transitionEnd += ' webkitTransitionEnd';
 	    transitionProperty = 'webkitTransition';
 	  } else if ('onotransitionend' in dom.tNode || navigator.appName === 'Opera') {
-
+	
 	    // Opera
 	    transitionEnd += ' oTransitionEnd';
 	    transitionProperty = 'oTransition';
@@ -4206,7 +5340,7 @@
 	    animationProperty = 'oAnimation';
 	  }
 	}
-
+	
 	/**
 	 * inject node with animation
 	 * @param  {[type]} node      [description]
@@ -4219,12 +5353,12 @@
 	  if (Array.isArray(node)) {
 	    var fragment = dom.fragment();
 	    var count = 0;
-
+	
 	    for (var i = 0, len = node.length; i < len; i++) {
 	      fragment.appendChild(node[i]);
 	    }
 	    dom.inject(fragment, refer, direction);
-
+	
 	    // if all nodes is done, we call the callback
 	    var enterCallback = function enterCallback() {
 	      count++;
@@ -4247,7 +5381,7 @@
 	    }
 	  }
 	};
-
+	
 	/**
 	 * remove node with animation
 	 * @param  {[type]}   node     [description]
@@ -4275,22 +5409,22 @@
 	    removeDone(node, callback);
 	  }
 	};
-
+	
 	var removeDone = function removeDone(node, callback) {
 	  dom.remove(node);
 	  callback && callback();
 	};
-
+	
 	animate.startClassAnimate = function (node, className, callback, mode) {
 	  var activeClassName, timeout, tid, onceAnim;
 	  if (!animationEnd && !transitionEnd || env.isRunning) {
 	    return callback();
 	  }
-
+	
 	  if (mode !== 4) {
 	    onceAnim = _.once(function onAnimateEnd() {
 	      if (tid) clearTimeout(tid);
-
+	
 	      if (mode === 2) {
 	        dom.delClass(node, activeClassName);
 	      }
@@ -4300,7 +5434,7 @@
 	      }
 	      dom.off(node, animationEnd, onceAnim);
 	      dom.off(node, transitionEnd, onceAnim);
-
+	
 	      callback();
 	    });
 	  } else {
@@ -4312,11 +5446,11 @@
 	  if (mode === 2) {
 	    // auto removed
 	    dom.addClass(node, className);
-
+	
 	    activeClassName = _.map(className.split(/\s+/), function (name) {
 	      return name + '-active';
 	    }).join(" ");
-
+	
 	    dom.nextReflow(function () {
 	      dom.addClass(node, activeClassName);
 	      timeout = getMaxTimeout(node);
@@ -4335,36 +5469,36 @@
 	      tid = setTimeout(onceAnim, timeout);
 	    });
 	  }
-
+	
 	  dom.on(node, animationEnd, onceAnim);
 	  dom.on(node, transitionEnd, onceAnim);
 	  return onceAnim;
 	};
-
+	
 	animate.startStyleAnimate = function (node, styles, callback) {
 	  var timeout, onceAnim, tid;
-
+	
 	  dom.nextReflow(function () {
 	    dom.css(node, styles);
 	    timeout = getMaxTimeout(node);
 	    tid = setTimeout(onceAnim, timeout);
 	  });
-
+	
 	  onceAnim = _.once(function onAnimateEnd() {
 	    if (tid) clearTimeout(tid);
-
+	
 	    dom.off(node, animationEnd, onceAnim);
 	    dom.off(node, transitionEnd, onceAnim);
-
+	
 	    callback();
 	  });
-
+	
 	  dom.on(node, animationEnd, onceAnim);
 	  dom.on(node, transitionEnd, onceAnim);
-
+	
 	  return onceAnim;
 	};
-
+	
 	/**
 	 * get maxtimeout
 	 * @param  {Node} node 
@@ -4378,9 +5512,9 @@
 	      aDelay = 0,
 	      ratio = 5 / 3,
 	      styles;
-
+	
 	  if (window.getComputedStyle) {
-
+	
 	    styles = window.getComputedStyle(node), tDuration = getMaxTime(styles[transitionProperty + 'Duration']) || tDuration;
 	    tDelay = getMaxTime(styles[transitionProperty + 'Delay']) || tDelay;
 	    aDuration = getMaxTime(styles[animationProperty + 'Duration']) || aDuration;
@@ -4389,38 +5523,38 @@
 	  }
 	  return timeout * 1000 * ratio;
 	}
-
+	
 	function getMaxTime(str) {
-
+	
 	  var maxTimeout = 0,
 	      time;
-
+	
 	  if (!str) return 0;
-
+	
 	  str.split(",").forEach(function (str) {
-
+	
 	    time = parseFloat(str);
 	    if (time > maxTimeout) maxTimeout = time;
 	  });
-
+	
 	  return maxTimeout;
 	}
-
+	
 	module.exports = animate;
 
 /***/ },
-/* 21 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var _ = __webpack_require__(5);
-	var combine = __webpack_require__(19);
-
+	
+	var _ = __webpack_require__(10);
+	var combine = __webpack_require__(24);
+	
 	function Group(list) {
 	  this.children = list || [];
 	}
-
+	
 	var o = _.extend(Group.prototype, {
 	  destroy: function destroy(first) {
 	    combine.destroy(this.children, first);
@@ -4435,19 +5569,19 @@
 	  }
 	});
 	o.inject = o.$inject = combine.inject;
-
+	
 	module.exports = Group;
 
 /***/ },
-/* 22 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// simplest event emitter 60 lines
 	// ===============================
 	"use strict";
-
+	
 	var slice = [].slice,
-	    _ = __webpack_require__(5);
+	    _ = __webpack_require__(10);
 	var API = {
 	  $on: function $on(event, fn) {
 	    if (typeof event === "object") {
@@ -4469,7 +5603,7 @@
 	    if (!event) this._handles = {};
 	    var handles = context._handles,
 	        calls;
-
+	
 	    if (calls = handles[event]) {
 	      if (!fn) {
 	        handles[event] = [];
@@ -4495,7 +5629,7 @@
 	    if (!event) return;
 	    var args = slice.call(arguments, 1);
 	    var type = event;
-
+	
 	    if (!handles) return context;
 	    if (calls = handles[type.slice(1)]) {
 	      for (var j = 0, len = calls.length; j < len; j++) {
@@ -4515,7 +5649,7 @@
 	// container class
 	function Event() {}
 	_.extend(Event.prototype, API);
-
+	
 	Event.mixTo = function (obj) {
 	  obj = typeof obj === "function" ? obj.prototype : obj;
 	  _.extend(obj, API);
@@ -4523,19 +5657,19 @@
 	module.exports = Event;
 
 /***/ },
-/* 23 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var _ = __webpack_require__(5);
-	var parseExpression = __webpack_require__(24).expression;
-	var diff = __webpack_require__(18);
+	
+	var _ = __webpack_require__(10);
+	var parseExpression = __webpack_require__(29).expression;
+	var diff = __webpack_require__(23);
 	var diffArray = diff.diffArray;
 	var diffObject = diff.diffObject;
-
+	
 	function Watcher() {}
-
+	
 	var methods = {
 	  $watch: function $watch(expr, fn, options) {
 	    var get,
@@ -4544,7 +5678,7 @@
 	        rlen,
 	        extra = this.__ext__; //records length
 	    if (!this._watchers) this._watchers = [];
-
+	
 	    options = options || {};
 	    if (options === true) {
 	      options = { deep: true };
@@ -4576,7 +5710,7 @@
 	        once = expr.once;
 	      }
 	    }
-
+	
 	    var watcher = {
 	      id: uid,
 	      get: get,
@@ -4589,9 +5723,9 @@
 	      deep: options.deep,
 	      last: options.sync ? get(this) : options.last
 	    };
-
+	
 	    this._watchers.push(watcher);
-
+	
 	    rlen = this._records && this._records.length;
 	    if (rlen) this._records[rlen - 1].push(uid);
 	    // init state.
@@ -4632,14 +5766,14 @@
 	   *                  Regular's parser extract the dependencies, in future maybe it will change to dirty-check combine with path-aware update;
 	   * @return {Void}   
 	   */
-
+	
 	  $digest: function $digest() {
 	    if (this.$phase === 'digest' || this._mute) return;
 	    this.$phase = 'digest';
 	    var dirty = false,
 	        n = 0;
 	    while (dirty = this._digest()) {
-
+	
 	      if (++n > 20) {
 	        // max loop
 	        throw Error('there may a circular dependencies reaches');
@@ -4650,7 +5784,7 @@
 	  },
 	  // private digest logic
 	  _digest: function _digest() {
-
+	
 	    var watchers = this._watchers;
 	    var dirty = false,
 	        children,
@@ -4668,7 +5802,7 @@
 	    if (children && children.length) {
 	      for (var m = 0, mlen = children.length; m < mlen; m++) {
 	        var child = children[m];
-
+	
 	        if (child && child._digest()) dirty = true;
 	      }
 	    }
@@ -4678,17 +5812,17 @@
 	  _checkSingleWatch: function _checkSingleWatch(watcher, i) {
 	    var dirty = false;
 	    if (!watcher) return;
-
+	
 	    var now, last, tlast, tnow, eq, diff;
-
+	
 	    if (!watcher.test) {
-
+	
 	      now = watcher.get(this);
 	      last = watcher.last;
 	      tlast = _.typeOf(last);
 	      tnow = _.typeOf(now);
 	      eq = true, diff;
-
+	
 	      // !Object
 	      if (!(tnow === 'object' && tlast === 'object' && watcher.deep)) {
 	        // Array
@@ -4723,10 +5857,10 @@
 	      watcher.fn.call(this, now, last, diff);
 	      if (watcher.once) this._watchers.splice(i, 1);
 	    }
-
+	
 	    return dirty;
 	  },
-
+	
 	  /**
 	   * **tips**: whatever param you passed in $update, after the function called, dirty-check(digest) phase will enter;
 	   * 
@@ -4761,14 +5895,14 @@
 	      if (rootParent.data.isolate || !rootParent.$parent) break;
 	      rootParent = rootParent.$parent;
 	    } while (rootParent);
-
+	
 	    var prephase = rootParent.$phase;
 	    rootParent.$phase = 'digest';
-
+	
 	    this.$set.apply(this, arguments);
-
+	
 	    rootParent.$phase = prephase;
-
+	
 	    rootParent.$digest();
 	    return this;
 	  },
@@ -4781,25 +5915,25 @@
 	    return this._records.pop();
 	  }
 	};
-
+	
 	_.extend(Watcher.prototype, methods);
-
+	
 	Watcher.mixTo = function (obj) {
 	  obj = typeof obj === "function" ? obj.prototype : obj;
 	  return _.extend(obj, methods);
 	};
-
+	
 	module.exports = Watcher;
 
 /***/ },
-/* 24 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var exprCache = __webpack_require__(4).exprCache;
-	var _ = __webpack_require__(5);
-	var Parser = __webpack_require__(13);
+	
+	var exprCache = __webpack_require__(9).exprCache;
+	var _ = __webpack_require__(10);
+	var Parser = __webpack_require__(18);
 	module.exports = {
 	  expression: function expression(expr, simple) {
 	    // @TODO cache
@@ -4814,13 +5948,13 @@
 	};
 
 /***/ },
-/* 25 */
+/* 30 */
 /***/ function(module, exports) {
 
 	'use strict';
-
+	
 	var f = module.exports = {};
-
+	
 	// json:  two way
 	//  - get: JSON.stringify
 	//  - set: JSON.parse
@@ -4833,14 +5967,14 @@
 	    return typeof JSON !== 'undefined' ? JSON.parse(value) : value;
 	  }
 	};
-
+	
 	// last: one-way
 	//  - get: return the last item in list
 	//  - example: `{ list|last }`
 	f.last = function (arr) {
 	  return arr && arr[arr.length - 1];
 	};
-
+	
 	// average: one-way
 	//  - get: copute the average of the list
 	//  - example: `{ list| average: "score" }`
@@ -4848,7 +5982,7 @@
 	  array = array || [];
 	  return array.length ? f.total(array, key) / array.length : 0;
 	};
-
+	
 	// total: one-way
 	//  - get: copute the total of the list
 	//  - example: `{ list| total: "score" }`
@@ -4860,7 +5994,7 @@
 	  });
 	  return total;
 	};
-
+	
 	// var basicSortFn = function(a, b){return b - a}
 
 	// f.sort = function(array, key, reverse){
@@ -4879,21 +6013,21 @@
 	// }
 
 /***/ },
-/* 26 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Regular
 	"use strict";
-
-	var _ = __webpack_require__(5);
-	var dom = __webpack_require__(16);
-	var animate = __webpack_require__(20);
-	var Regular = __webpack_require__(11);
-	var consts = __webpack_require__(27);
-
-	__webpack_require__(28);
-	__webpack_require__(29);
-
+	
+	var _ = __webpack_require__(10);
+	var dom = __webpack_require__(21);
+	var animate = __webpack_require__(25);
+	var Regular = __webpack_require__(16);
+	var consts = __webpack_require__(32);
+	
+	__webpack_require__(33);
+	__webpack_require__(34);
+	
 	module.exports = {
 	  // **warn**: class inteplation will override this directive
 	  'r-class': function rClass(elem, value) {
@@ -4979,22 +6113,22 @@
 	    }
 	  }
 	};
-
+	
 	Regular.directive(module.exports);
 
 /***/ },
-/* 27 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
-
+	
 	module.exports = {
 	  'COMPONENT_TYPE': 1,
 	  'ELEMENT_TYPE': 2
 	};
 
 /***/ },
-/* 28 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -5002,13 +6136,13 @@
 	 *
 	 */
 	"use strict";
-
-	var _ = __webpack_require__(5);
-	var dom = __webpack_require__(16);
-	var Regular = __webpack_require__(11);
-
+	
+	var _ = __webpack_require__(10);
+	var dom = __webpack_require__(21);
+	var Regular = __webpack_require__(16);
+	
 	Regular._addProtoInheritCache("event");
-
+	
 	Regular.directive(/^on-\w+$/, function (elem, value, name, attrs) {
 	  if (!name || !value) return;
 	  var type = name.split("-")[1];
@@ -5024,14 +6158,14 @@
 	  if (!name || !value) return;
 	  var type = name.split("-")[1];
 	  var fire = _.handleEvent.call(this, value, type);
-
+	
 	  function delegateEvent(ev) {
 	    matchParent(ev, _delegates[type], root.parentNode);
 	  }
-
+	
 	  if (!_delegates[type]) {
 	    _delegates[type] = [];
-
+	
 	    if (root.parentNode) {
 	      dom.on(root.parentNode, type, delegateEvent);
 	    } else {
@@ -5053,7 +6187,7 @@
 	    fire: fire
 	  };
 	  _delegates[type].push(delegate);
-
+	
 	  return function () {
 	    var delegates = _delegates[type];
 	    if (!delegates || !delegates.length) return;
@@ -5062,7 +6196,7 @@
 	    }
 	  };
 	});
-
+	
 	function matchParent(ev, delegates, stop) {
 	  if (!stop) return;
 	  var target = ev.target,
@@ -5079,41 +6213,41 @@
 	}
 
 /***/ },
-/* 29 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Regular
 	"use strict";
-
-	var _ = __webpack_require__(5);
-	var dom = __webpack_require__(16);
-	var Regular = __webpack_require__(11);
-
+	
+	var _ = __webpack_require__(10);
+	var dom = __webpack_require__(21);
+	var Regular = __webpack_require__(16);
+	
 	var modelHandlers = {
 	  "text": initText,
 	  "select": initSelect,
 	  "checkbox": initCheckBox,
 	  "radio": initRadio
 	};
-
+	
 	// @TODO
-
+	
 	// two-way binding with r-model
 	// works on input, textarea, checkbox, radio, select
-
+	
 	Regular.directive("r-model", function (elem, value) {
 	  var tag = elem.tagName.toLowerCase();
 	  var sign = tag;
 	  if (sign === "input") sign = elem.type || "text";else if (sign === "textarea") sign = "text";
 	  if (typeof value === "string") value = this.$expression(value);
-
+	
 	  if (modelHandlers[sign]) return modelHandlers[sign].call(this, elem, value);else if (tag === "input") {
 	    return modelHandlers.text.call(this, elem, value);
 	  }
 	});
-
+	
 	// binding <select>
-
+	
 	function initSelect(elem, parsed) {
 	  var self = this;
 	  var wc = this.$watch(parsed, function (newValue) {
@@ -5124,15 +6258,15 @@
 	      }
 	    });
 	  });
-
+	
 	  function handler() {
 	    parsed.set(self, this.value);
 	    wc.last = this.value;
 	    self.$update();
 	  }
-
+	
 	  dom.on(elem, "change", handler);
-
+	
 	  if (parsed.get(self) === undefined && elem.value) {
 	    parsed.set(self, elem.value);
 	  }
@@ -5140,15 +6274,15 @@
 	    dom.off(elem, "change", handler);
 	  };
 	}
-
+	
 	// input,textarea binding
-
+	
 	function initText(elem, parsed) {
 	  var self = this;
 	  var wc = this.$watch(parsed, function (newValue) {
 	    if (elem.value !== newValue) elem.value = newValue == null ? "" : "" + newValue;
 	  });
-
+	
 	  // @TODO to fixed event
 	  var handler = function handler(ev) {
 	    var that = this;
@@ -5166,7 +6300,7 @@
 	      self.$update();
 	    }
 	  };
-
+	
 	  if (dom.msie !== 9 && "oninput" in dom.tNode) {
 	    elem.addEventListener("input", handler);
 	  } else {
@@ -5189,15 +6323,15 @@
 	    }
 	  };
 	}
-
+	
 	// input:checkbox  binding
-
+	
 	function initCheckBox(elem, parsed) {
 	  var self = this;
 	  var watcher = this.$watch(parsed, function (newValue) {
 	    dom.attr(elem, 'checked', !!newValue);
 	  });
-
+	
 	  var handler = function handler() {
 	    var value = this.checked;
 	    parsed.set(self, value);
@@ -5205,24 +6339,24 @@
 	    self.$update();
 	  };
 	  if (parsed.set) dom.on(elem, "change", handler);
-
+	
 	  if (parsed.get(self) === undefined) {
 	    parsed.set(self, !!elem.checked);
 	  }
-
+	
 	  return function destroy() {
 	    if (parsed.set) dom.off(elem, "change", handler);
 	  };
 	}
-
+	
 	// input:radio binding
-
+	
 	function initRadio(elem, parsed) {
 	  var self = this;
 	  var wc = this.$watch(parsed, function (newValue) {
 	    if (newValue == elem.value) elem.checked = true;else elem.checked = false;
 	  });
-
+	
 	  var handler = function handler() {
 	    var value = this.value;
 	    parsed.set(self, value);
@@ -5235,24 +6369,24 @@
 	      parsed.set(self, elem.value);
 	    }
 	  }
-
+	
 	  return function destroy() {
 	    if (parsed.set) dom.off(elem, "change", handler);
 	  };
 	}
 
 /***/ },
-/* 30 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
+	
 	var // packages
-	_ = __webpack_require__(5),
-	    animate = __webpack_require__(20),
-	    dom = __webpack_require__(16),
-	    Regular = __webpack_require__(11);
-
+	_ = __webpack_require__(10),
+	    animate = __webpack_require__(25),
+	    dom = __webpack_require__(21),
+	    Regular = __webpack_require__(16);
+	
 	var // variables
 	rClassName = /^[-\w]+(\s[-\w]+)*$/,
 	    rCommaSep = /[\r\n\f ]*,[\r\n\f ]*(?=\w+\:)/,
@@ -5264,19 +6398,19 @@
 	WHEN_COMMAND = "when",
 	    EVENT_COMMAND = "on",
 	    THEN_COMMAND = "then";
-
+	
 	/**
 	 * Animation Plugin
 	 * @param {Component} Component 
 	 */
-
+	
 	function createSeed(type) {
-
+	
 	  var steps = [],
 	      current = 0,
 	      callback = _.noop;
 	  var key;
-
+	
 	  var out = {
 	    type: type,
 	    start: function start(cb) {
@@ -5311,12 +6445,12 @@
 	      steps.push(step);
 	    }
 	  };
-
+	
 	  return out;
 	}
-
+	
 	Regular._addProtoInheritCache("animation");
-
+	
 	// builtin animation
 	Regular.animation({
 	  "wait": function wait(step) {
@@ -5330,7 +6464,7 @@
 	    var tmp = step.param.split(","),
 	        className = tmp[0] || "",
 	        mode = parseInt(tmp[1]) || 1;
-
+	
 	    return function (done) {
 	      // _.log(className)
 	      animate.startClassAnimate(step.element, className, done, mode);
@@ -5351,9 +6485,9 @@
 	    var tmp = param.split(","),
 	        evt = tmp[0] || "",
 	        args = tmp[1] ? this.$expression(tmp[1]).get : null;
-
+	
 	    if (!evt) throw Error("you shoud specified a eventname in emit command");
-
+	
 	    var self = this;
 	    return function (done) {
 	      self.$emit(evt, args ? args(self) : undefined);
@@ -5372,13 +6506,13 @@
 	        var tmp = pair.split(rSpace),
 	            name = tmp.shift(),
 	            value = tmp.join(" ");
-
+	
 	        if (!name || !value) throw Error("invalid style in command: style");
 	        styles[name] = value;
 	        valid = true;
 	      }
 	    });
-
+	
 	    return function (done) {
 	      if (valid) {
 	        animate.startStyleAnimate(step.element, styles, done);
@@ -5388,19 +6522,19 @@
 	    };
 	  }
 	});
-
+	
 	// hancdle the r-animation directive
 	// el : the element to process
 	// value: the directive value
 	function processAnimate(element, value) {
 	  var Component = this.constructor;
-
+	
 	  if (_.isExpr(value)) {
 	    value = value.get(this);
 	  }
-
+	
 	  value = value.trim();
-
+	
 	  var composites = value.split(";"),
 	      composite,
 	      context = this,
@@ -5414,38 +6548,38 @@
 	      tmp,
 	      animator,
 	      self = this;
-
+	
 	  function reset(type) {
 	    seed && seeds.push(seed);
 	    seed = createSeed(type);
 	  }
-
+	
 	  function whenCallback(start, value) {
 	    if (!!value) start();
 	  }
-
+	
 	  function animationDestroy(element) {
 	    return function () {
 	      element.onenter = null;
 	      element.onleave = null;
 	    };
 	  }
-
+	
 	  for (var i = 0, len = composites.length; i < len; i++) {
-
+	
 	    composite = composites[i];
 	    tmp = composite.split(":");
 	    command = tmp[0] && tmp[0].trim();
 	    param = tmp[1] && tmp[1].trim();
-
+	
 	    if (!command) continue;
-
+	
 	    if (command === WHEN_COMMAND) {
 	      reset("when");
 	      this.$watch(param, whenCallback.bind(this, seed.start));
 	      continue;
 	    }
-
+	
 	    if (command === EVENT_COMMAND) {
 	      reset(param);
 	      if (param === "leave") {
@@ -5466,7 +6600,7 @@
 	      }
 	      continue;
 	    }
-
+	
 	    var animator = Component.animation(command);
 	    if (animator && seed) {
 	      seed.push(animator.call(this, {
@@ -5478,7 +6612,7 @@
 	      throw Error(animator ? "you should start with `on` or `event` in animation" : "undefined animator 【" + command + "】");
 	    }
 	  }
-
+	
 	  if (destroies.length) {
 	    return function () {
 	      destroies.forEach(function (destroy) {
@@ -5487,24 +6621,24 @@
 	    };
 	  }
 	}
-
+	
 	Regular.directive("r-animation", processAnimate);
 	Regular.directive("r-anim", processAnimate);
 
 /***/ },
-/* 31 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var Regular = __webpack_require__(11);
-
+	
+	var Regular = __webpack_require__(16);
+	
 	/**
 	 * Timeout Module
 	 * @param {Component} Component 
 	 */
 	function TimeoutModule(Component) {
-
+	
 	  Component.implement({
 	    /**
 	     * just like setTimeout, but will enter digest automately
@@ -5534,62 +6668,1177 @@
 	    }
 	  });
 	}
-
+	
 	Regular.plugin('timeout', TimeoutModule);
 	Regular.plugin('$timeout', TimeoutModule);
 
 /***/ },
-/* 32 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
+	
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _loginHtml = __webpack_require__(33);
-
-	var _loginHtml2 = _interopRequireDefault(_loginHtml);
-
-	var _regularjs = __webpack_require__(3);
-
+	
+	var _regularjs = __webpack_require__(8);
+	
 	var _regularjs2 = _interopRequireDefault(_regularjs);
-
-	var LoginBabel = _regularjs2['default'].extend({
-
-	  name: 'login-babel',
-
-	  template: _loginHtml2['default']
+	
+	var _whatwgFetch = __webpack_require__(38);
+	
+	var _whatwgFetch2 = _interopRequireDefault(_whatwgFetch);
+	
+	var _componentsMenuJs = __webpack_require__(39);
+	
+	var _componentsMenuJs2 = _interopRequireDefault(_componentsMenuJs);
+	
+	var tpl = '\n  <nav class="navbar navbar-inverse navbar-fixed-top">\n    <div class="container-fluid">\n      <div class="navbar-header">\n        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">\n          <span class="sr-only">Toggle navigation</span>\n          <span class="icon-bar"></span>\n          <span class="icon-bar"></span>\n          <span class="icon-bar"></span>\n        </button>\n        <span class="navbar-brand" href="#">theme from <a href="http://getbootstrap.com/examples/dashboard/">[bootstrap]</a> </span>\n      </div>\n      <div id="navbar" class="navbar-collapse collapse">\n        {#if !this.$state.user}\n        <form class="navbar-form navbar-right">\n          <input type="text" class="form-control" placeholder="User name" r-model=\'username\'>\n          <input type="text" class="form-control" placeholder="Password..." r-model=\'password\'>\n          <a href="javascript:;"class="btn btn-primary" on-click={this.login(username, password)}>login</a>\n        </form>\n        {#else}\n        <div class="navbar-brand navbar-right">Welcome, {this.$state.user.name} <a href="#" class=\'btn btn-primary\' on-click={this.logout()}>logout</a></div>\n        {/if}\n      </div>\n    </div>\n  </nav>\n  <div class="container-fluid">\n    <div class="row">\n      <div class="col-sm-3 col-md-2 sidebar">\n        <app-menu menus={menus} state={@(this.$state)}></app-menu>\n      </div>\n      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" >\n        <div ref=view></div>\n        <footer>\n          <p>© Company 2014</p>\n        </footer>\n      </div>\n    </div>\n  </div>';
+	
+	exports['default'] = _regularjs2['default'].extend({
+	
+	  template: tpl,
+	
+	  config: function config(data) {
+	    data.menus = [{ url: '/', name: "Home", state: "app.index" }, { url: '/blog', name: "Blog", state: 'app.blog' }, { url: '/chat', name: "Chat", state: 'app.chat' }];
+	  },
+	  login: function login(username, password) {
+	    // tip: this.$state can be touched in any module
+	    this.$state.user = {
+	      name: username,
+	      id: -1,
+	      avatar: "https://avatars1.githubusercontent.com/u/731333?v=3&s=460"
+	    };
+	
+	    try {
+	      localStorage.setItem("username", username);
+	    } catch (e) {}
+	
+	    return false;
+	  },
+	  logout: function logout() {
+	
+	    this.$state.user = null;
+	    this.$state.go("app.index");
+	    try {
+	      localStorage.setItem("username", "");
+	    } catch (e) {}
+	    return false;
+	  }
 	});
-
-	exports.LoginBabel = LoginBabel;
+	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 38 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<h2> {title} </h2>\n<form action=\"\">\n  <div class=\"form-control\">\n    <label for=\"\">User:{user}</label> \n    <input type=\"text\" r-model={user}>\n  </div>\n  <div class=\"form-control\">\n    <label for=\"\">Password</label>\n    <input type=\"password\">\n  </div>\n  <div class=\"form-control\">\n    <button>Login</button>\n  </div>\n</form>"
+	'use strict';
+	
+	(function () {
+	  'use strict';
+	
+	  if (self.fetch) {
+	    return;
+	  }
+	
+	  function normalizeName(name) {
+	    if (typeof name !== 'string') {
+	      name = String(name);
+	    }
+	    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+	      throw new TypeError('Invalid character in header field name');
+	    }
+	    return name.toLowerCase();
+	  }
+	
+	  function normalizeValue(value) {
+	    if (typeof value !== 'string') {
+	      value = String(value);
+	    }
+	    return value;
+	  }
+	
+	  function Headers(headers) {
+	    this.map = {};
+	
+	    if (headers instanceof Headers) {
+	      headers.forEach(function (value, name) {
+	        this.append(name, value);
+	      }, this);
+	    } else if (headers) {
+	      Object.getOwnPropertyNames(headers).forEach(function (name) {
+	        this.append(name, headers[name]);
+	      }, this);
+	    }
+	  }
+	
+	  Headers.prototype.append = function (name, value) {
+	    name = normalizeName(name);
+	    value = normalizeValue(value);
+	    var list = this.map[name];
+	    if (!list) {
+	      list = [];
+	      this.map[name] = list;
+	    }
+	    list.push(value);
+	  };
+	
+	  Headers.prototype['delete'] = function (name) {
+	    delete this.map[normalizeName(name)];
+	  };
+	
+	  Headers.prototype.get = function (name) {
+	    var values = this.map[normalizeName(name)];
+	    return values ? values[0] : null;
+	  };
+	
+	  Headers.prototype.getAll = function (name) {
+	    return this.map[normalizeName(name)] || [];
+	  };
+	
+	  Headers.prototype.has = function (name) {
+	    return this.map.hasOwnProperty(normalizeName(name));
+	  };
+	
+	  Headers.prototype.set = function (name, value) {
+	    this.map[normalizeName(name)] = [normalizeValue(value)];
+	  };
+	
+	  Headers.prototype.forEach = function (callback, thisArg) {
+	    Object.getOwnPropertyNames(this.map).forEach(function (name) {
+	      this.map[name].forEach(function (value) {
+	        callback.call(thisArg, value, name, this);
+	      }, this);
+	    }, this);
+	  };
+	
+	  function consumed(body) {
+	    if (body.bodyUsed) {
+	      return Promise.reject(new TypeError('Already read'));
+	    }
+	    body.bodyUsed = true;
+	  }
+	
+	  function fileReaderReady(reader) {
+	    return new Promise(function (resolve, reject) {
+	      reader.onload = function () {
+	        resolve(reader.result);
+	      };
+	      reader.onerror = function () {
+	        reject(reader.error);
+	      };
+	    });
+	  }
+	
+	  function readBlobAsArrayBuffer(blob) {
+	    var reader = new FileReader();
+	    reader.readAsArrayBuffer(blob);
+	    return fileReaderReady(reader);
+	  }
+	
+	  function readBlobAsText(blob) {
+	    var reader = new FileReader();
+	    reader.readAsText(blob);
+	    return fileReaderReady(reader);
+	  }
+	
+	  var support = {
+	    blob: 'FileReader' in self && 'Blob' in self && (function () {
+	      try {
+	        new Blob();
+	        return true;
+	      } catch (e) {
+	        return false;
+	      }
+	    })(),
+	    formData: 'FormData' in self,
+	    arrayBuffer: 'ArrayBuffer' in self
+	  };
+	
+	  function Body() {
+	    this.bodyUsed = false;
+	
+	    this._initBody = function (body) {
+	      this._bodyInit = body;
+	      if (typeof body === 'string') {
+	        this._bodyText = body;
+	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+	        this._bodyBlob = body;
+	      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+	        this._bodyFormData = body;
+	      } else if (!body) {
+	        this._bodyText = '';
+	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
+	        // Only support ArrayBuffers for POST method.
+	        // Receiving ArrayBuffers happens via Blobs, instead.
+	      } else {
+	          throw new Error('unsupported BodyInit type');
+	        }
+	    };
+	
+	    if (support.blob) {
+	      this.blob = function () {
+	        var rejected = consumed(this);
+	        if (rejected) {
+	          return rejected;
+	        }
+	
+	        if (this._bodyBlob) {
+	          return Promise.resolve(this._bodyBlob);
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as blob');
+	        } else {
+	          return Promise.resolve(new Blob([this._bodyText]));
+	        }
+	      };
+	
+	      this.arrayBuffer = function () {
+	        return this.blob().then(readBlobAsArrayBuffer);
+	      };
+	
+	      this.text = function () {
+	        var rejected = consumed(this);
+	        if (rejected) {
+	          return rejected;
+	        }
+	
+	        if (this._bodyBlob) {
+	          return readBlobAsText(this._bodyBlob);
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as text');
+	        } else {
+	          return Promise.resolve(this._bodyText);
+	        }
+	      };
+	    } else {
+	      this.text = function () {
+	        var rejected = consumed(this);
+	        return rejected ? rejected : Promise.resolve(this._bodyText);
+	      };
+	    }
+	
+	    if (support.formData) {
+	      this.formData = function () {
+	        return this.text().then(decode);
+	      };
+	    }
+	
+	    this.json = function () {
+	      return this.text().then(JSON.parse);
+	    };
+	
+	    return this;
+	  }
+	
+	  // HTTP methods whose capitalization should be normalized
+	  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
+	
+	  function normalizeMethod(method) {
+	    var upcased = method.toUpperCase();
+	    return methods.indexOf(upcased) > -1 ? upcased : method;
+	  }
+	
+	  function Request(input, options) {
+	    options = options || {};
+	    var body = options.body;
+	    if (Request.prototype.isPrototypeOf(input)) {
+	      if (input.bodyUsed) {
+	        throw new TypeError('Already read');
+	      }
+	      this.url = input.url;
+	      this.credentials = input.credentials;
+	      if (!options.headers) {
+	        this.headers = new Headers(input.headers);
+	      }
+	      this.method = input.method;
+	      this.mode = input.mode;
+	      if (!body) {
+	        body = input._bodyInit;
+	        input.bodyUsed = true;
+	      }
+	    } else {
+	      this.url = input;
+	    }
+	
+	    this.credentials = options.credentials || this.credentials || 'omit';
+	    if (options.headers || !this.headers) {
+	      this.headers = new Headers(options.headers);
+	    }
+	    this.method = normalizeMethod(options.method || this.method || 'GET');
+	    this.mode = options.mode || this.mode || null;
+	    this.referrer = null;
+	
+	    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+	      throw new TypeError('Body not allowed for GET or HEAD requests');
+	    }
+	    this._initBody(body);
+	  }
+	
+	  Request.prototype.clone = function () {
+	    return new Request(this);
+	  };
+	
+	  function decode(body) {
+	    var form = new FormData();
+	    body.trim().split('&').forEach(function (bytes) {
+	      if (bytes) {
+	        var split = bytes.split('=');
+	        var name = split.shift().replace(/\+/g, ' ');
+	        var value = split.join('=').replace(/\+/g, ' ');
+	        form.append(decodeURIComponent(name), decodeURIComponent(value));
+	      }
+	    });
+	    return form;
+	  }
+	
+	  function headers(xhr) {
+	    var head = new Headers();
+	    var pairs = xhr.getAllResponseHeaders().trim().split('\n');
+	    pairs.forEach(function (header) {
+	      var split = header.trim().split(':');
+	      var key = split.shift().trim();
+	      var value = split.join(':').trim();
+	      head.append(key, value);
+	    });
+	    return head;
+	  }
+	
+	  Body.call(Request.prototype);
+	
+	  function Response(bodyInit, options) {
+	    if (!options) {
+	      options = {};
+	    }
+	
+	    this._initBody(bodyInit);
+	    this.type = 'default';
+	    this.status = options.status;
+	    this.ok = this.status >= 200 && this.status < 300;
+	    this.statusText = options.statusText;
+	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers);
+	    this.url = options.url || '';
+	  }
+	
+	  Body.call(Response.prototype);
+	
+	  Response.prototype.clone = function () {
+	    return new Response(this._bodyInit, {
+	      status: this.status,
+	      statusText: this.statusText,
+	      headers: new Headers(this.headers),
+	      url: this.url
+	    });
+	  };
+	
+	  Response.error = function () {
+	    var response = new Response(null, { status: 0, statusText: '' });
+	    response.type = 'error';
+	    return response;
+	  };
+	
+	  var redirectStatuses = [301, 302, 303, 307, 308];
+	
+	  Response.redirect = function (url, status) {
+	    if (redirectStatuses.indexOf(status) === -1) {
+	      throw new RangeError('Invalid status code');
+	    }
+	
+	    return new Response(null, { status: status, headers: { location: url } });
+	  };
+	
+	  self.Headers = Headers;
+	  self.Request = Request;
+	  self.Response = Response;
+	
+	  self.fetch = function (input, init) {
+	    return new Promise(function (resolve, reject) {
+	      var request;
+	      if (Request.prototype.isPrototypeOf(input) && !init) {
+	        request = input;
+	      } else {
+	        request = new Request(input, init);
+	      }
+	
+	      var xhr = new XMLHttpRequest();
+	
+	      function responseURL() {
+	        if ('responseURL' in xhr) {
+	          return xhr.responseURL;
+	        }
+	
+	        // Avoid security warnings on getResponseHeader when not allowed by CORS
+	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+	          return xhr.getResponseHeader('X-Request-URL');
+	        }
+	
+	        return;
+	      }
+	
+	      xhr.onload = function () {
+	        var status = xhr.status === 1223 ? 204 : xhr.status;
+	        if (status < 100 || status > 599) {
+	          reject(new TypeError('Network request failed'));
+	          return;
+	        }
+	        var options = {
+	          status: status,
+	          statusText: xhr.statusText,
+	          headers: headers(xhr),
+	          url: responseURL()
+	        };
+	        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+	        resolve(new Response(body, options));
+	      };
+	
+	      xhr.onerror = function () {
+	        reject(new TypeError('Network request failed'));
+	      };
+	
+	      xhr.open(request.method, request.url, true);
+	
+	      if (request.credentials === 'include') {
+	        xhr.withCredentials = true;
+	      }
+	
+	      if ('responseType' in xhr && support.blob) {
+	        xhr.responseType = 'blob';
+	      }
+	
+	      request.headers.forEach(function (value, name) {
+	        xhr.setRequestHeader(name, value);
+	      });
+	
+	      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit);
+	    });
+	  };
+	  self.fetch.polyfill = true;
+	})();
 
 /***/ },
-/* 34 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var tpl = __webpack_require__(2);
-	var Regular = __webpack_require__(3);
-
-	var LoginCommon = Regular.extend({
-
-	  name: 'login-common',
-
-	  template: tpl
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
 	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var tpl = '\n<ul class="nav nav-sidebar">\n  {#list menus as menu}\n    <li class={state.is(menu.state)?\'active\':\'\'}><a href="#!{menu.url}">{menu.name}</a></li>\n  {/list}\n</ul>\n';
+	
+	var Menu = _regularjs2['default'].extend({
+	  name: 'app-menu',
+	  template: tpl,
+	
+	  config: function config(data) {
+	    var _this = this;
+	
+	    // 确保在每次state改变后Menu会重新update
+	    data.state.on("end", function () {
+	      return _this.$update();
+	    });
+	  }
+	});
+	
+	exports['default'] = Menu;
+	module.exports = exports['default'];
 
-	exports.LoginCommon = LoginCommon;
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var tpl = "\n<h1 class=\"page-header\">Blog</h1>\n<nav class=\"navbar navbar-default\">\n  <div class=\"container-fluid\">\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav\">\n        <li  class={ this.$state.is(\"app.blog.list\")? 'active':'' }>\n          <a href={'app.blog.list'|encode}>List</a>\n        </li>\n        <li  class={ this.$state.is(\"app.blog.detail\")? 'active':'' }>\n          <a href=\"javascript:;\">Detail</a>\n        </li>\n        <li  class={ this.$state.is(\"app.blog.edit\")? 'active':'' }>\n          <a href={'app.blog.edit'|encode: {id: -1}}>Edit</a>\n        </li>\n      </ul>\n    </div>\n    </div>\n</nav>\n<menu state={$state} menu={menus} ></menu>\n<div class=\"col-sm-12\" ref=view></div>\n";
+	
+	exports["default"] = _regularjs2["default"].extend({
+	
+	  template: tpl,
+	
+	  config: function config() {
+	    this.$state.on("end", this.$update.bind(this, null));
+	  }
+	});
+	module.exports = exports["default"];
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var tpl = "\n<div class=\"panel panel-primary\">\n  <div class=\"panel-heading\">\n    <h3 class=\"panel-title\">Chat Room <span class=\"badge\">{messages.length}</span></h3>\n  </div>\n  <div class=\"panel-body\">\n  <div class=\"message-list\">\n  {#list messages as message}\n  <div class=\"media\" r-animation=\"on: enter; class: animated fadeInY; on: leave; class: animated fadeOutY;\">\n    <a class=\"media-left\" href=\"#\">\n      <img  src=\"{message.user.avatar}\"  style=\"width: 64px; height: 64px;\">\n    </a>\n    <div class=\"media-body\">\n      <h4 class=\"media-heading\"><a href=\"#!/user/{message.user.id}\">{message.user.name}</a> \n      <span class='small'>{message.time|format}</span>\n      <a href=\"#\" r-hide={message.user !== this.$state.user} on-click={messages.splice(message_index, 1)}>delete</a>\n      </h4>\n      {message.content} \n    </div>\n  </div>\n  {/list}\n  </div>\n    \n  </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <div class=\"input-group\">\n          <input type=\"text\" class=\"form-control\" r-model={text} on-enter={this.post(text)} placeholder=\"Say something for...\">\n          <span class=\"input-group-btn\">\n            <button class=\"btn btn-primary\" type=\"button\" on-click={this.post(text)}>Post Message!</button>\n          </span>\n        </div><!-- /input-group -->\n      </div><!-- /.col-lg-6 -->\n    </div><!-- /.row -->\n</div>\n";
+	
+	// 偷懒，用本地数据
+	exports["default"] = _regularjs2["default"].extend({
+	  // automate convert to Regular Component
+	  regularify: true,
+	
+	  template: tpl,
+	
+	  enter: function enter(option) {
+	    var page = option.page || 1;
+	    if (!this.data.messages) this.data.messages = [];
+	  },
+	
+	  post: function post(text) {
+	    var data = this.data;
+	
+	    data.messages.push({
+	      user: this.$state.user,
+	      content: text,
+	      time: +new Date()
+	    });
+	
+	    data.text = "";
+	  }
+	});
+	module.exports = exports["default"];
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"jumbotron\">\n  <div class=\"container\">\n    <h1>Hello!</h1>\n    <p>\n      This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.\n    </p>\n    <p>\n      <a class=\"btn btn-primary btn-lg\" href=\"#!/blog\" role=\"button\">See Blogs »</a>\n    </p>\n  </div>\n</div>\n<div class=\"row\">\n  <div class=\"col-md-4\">\n    <h2>Heading<span class=\"label label-default\">New</span></h2>\n    <p>\n      Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.\n    </p>\n    <p>\n    </p>\n  </div>\n  <div class=\"col-md-4\">\n    <h2>Heading<span class=\"label label-default\">New</span></h2>\n    <p>\n      Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.\n    </p>\n    <p>\n    </p>\n  </div>\n  <div class=\"col-md-4\">\n    <h2>Heading<span class=\"label label-default\">New</span></h2>\n    <p>\n      Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.\n    </p>\n    <p>\n    </p>\n  </div>\n</div>\n"
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// User 还没有实现， 有兴趣的同学可以自己实现这个模块
+	
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var tpl = '\n  <div>User Page</div>\n  <div ref=view></div>\n';
+	
+	exports['default'] = _regularjs2['default'].extend({
+	
+	  template: tpl
+	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var _utilFetchJs = __webpack_require__(45);
+	
+	var _utilHelperJs = __webpack_require__(47);
+	
+	var _utilHelperJs2 = _interopRequireDefault(_utilHelperJs);
+	
+	var tpl = '\n<div class="blog-post">\n  <h2 class="blog-post-title">{title}\n    <span class="badge">preview</span>\n    <a href={\'app.blog.edit\'|encode: {id: id} }>Edit</a>\n  </h2>\n\n  <div class="form-group">\n  <label for="content">Tag</label>\n  <div>\n   {#list tags as tag by tag_index}\n   <span class="label label-info">{tag}</span>\n   {/list}\n  </div>\n  </div>\n  <div class="blog-post-meta">\n    {time|format}\n    <a href=\'javascript:;\'>{user.name}</a>\n    <div class="content" r-html=\'content\'></div>\n  </div>\n</div>\n';
+	
+	exports['default'] = _regularjs2['default'].extend({
+	
+	  template: tpl,
+	  enter: function enter(option) {
+	    this.update(option);
+	  },
+	  update: function update(option) {
+	    var _this = this;
+	
+	    var data = this.data;
+	    var id = data.id = parseInt(option.param.id);
+	
+	    _utilFetchJs.blog.get(id).then(function (detail) {
+	      data.blog = detail;
+	      _utilHelperJs2['default'].extend(data, detail, true);
+	      _this.$update();
+	    });
+	  }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _componentsProgressJs = __webpack_require__(46);
+	
+	var _componentsProgressJs2 = _interopRequireDefault(_componentsProgressJs);
+	
+	__webpack_require__(38);
+	
+	var _helperJs = __webpack_require__(47);
+	
+	var _helperJs2 = _interopRequireDefault(_helperJs);
+	
+	var fetchBase = window.fetch;
+	
+	var progress = undefined;
+	
+	/**
+	 * 建议所有的产品都为xhr设置一个统一入口， 方便加上统一逻辑. 
+	 */
+	function fetch(url) {
+	  var opt = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	  if (!progress) progress = new _componentsProgressJs2['default']();
+	
+	  opt.method = opt.method || 'GET';
+	
+	  // 1. 根据规范， 我们fix一些参数
+	  var queryString = undefined;
+	  if (opt.data) {
+	    if (/GET|HEAD/.test(opt.method)) {
+	      url = url + '?' + _helperJs2['default'].obj2query(opt.data);
+	    } else {
+	
+	      opt.headers = {
+	        'Accept': 'application/json',
+	        'Content-Type': 'application/json'
+	      };
+	      opt.body = JSON.stringify(opt.data);
+	    }
+	  }
+	
+	  var indicator = undefined;
+	
+	  if (opt.noProgress !== false) {
+	    indicator = progress;
+	    indicator.start();
+	  }
+	
+	  return fetchBase(url, opt).then(function (ret) {
+	
+	    indicator && indicator.end();
+	    return ret.json();
+	  })['catch'](function (err) {
+	
+	    indicator && indicator.end(true);
+	    throw err;
+	  });
+	}
+	
+	var blog = {
+	
+	  fetchList: function fetchList(page) {
+	
+	    page = parseInt(page) - 1;
+	
+	    return fetch('/api/blogs', {
+	      data: {
+	        limit: 20,
+	        offset: page * 20
+	      }
+	    });
+	  },
+	
+	  get: function get(id) {
+	    return fetch('/api/blogs/' + id);
+	  },
+	
+	  update: function update(id, blog) {
+	    return fetch('/api/blogs/' + id, {
+	      method: 'PUT',
+	      data: blog
+	    });
+	  },
+	
+	  add: function add(blog) {
+	
+	    return fetch('/api/blogs', {
+	      method: 'POST',
+	      data: blog
+	    });
+	  },
+	
+	  remove: function remove(id) {
+	    return fetch('/api/blogs/' + id, {
+	      method: 'DELETE'
+	    });
+	  }
+	
+	};
+	
+	var user = {
+	
+	  login: function login() {
+	    return fetch('/api/user/login');
+	  },
+	  logout: function logout() {
+	    return fetch('/api/user/logout');
+	  }
+	};
+	
+	var chat = {
+	  fetchList: function fetchList() {
+	    return fetch('/api/chat');
+	  },
+	  remove: function remove(id) {
+	    return fetch('/api/chat/' + id, {
+	      method: 'DELETE'
+	    });
+	  }
+	};
+	
+	exports.fetch = fetch;
+	exports.blog = blog;
+	exports.user = user;
+	exports.chat = chat;
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var _utilHelper = __webpack_require__(47);
+	
+	var _utilHelper2 = _interopRequireDefault(_utilHelper);
+	
+	var tpl = '\n<div class="progress progress-fix animated" r-hide={!progress}  r-animation= \'on:enter; class: {inClass}; on: leave; class: {outClass};\'>\n  <div class="progress-bar progress-bar-striped active" role="rogressbar" style=" background-color: {currentColor};width: {percent||0}% ;">\n  </div>\n</div>\n';
+	
+	function mix(c1, c2, weight) {
+	  var p = weight / 100,
+	      a = 0,
+	      w = p * 2 - 1,
+	      w1 = ((w * a == -1 ? w : (w + a) / (1 + w * a)) + 1) / 2.0,
+	      w2 = 1 - w1,
+	      channels = [parseInt(c1[0] * w1 + c2[0] * w2, 10), parseInt(c1[1] * w1 + c2[1] * w2, 10), parseInt(c1[2] * w1 + c2[2] * w2, 10)];
+	  return channels;
+	}
+	
+	var COLORS = {
+	  SUCCESS: [92, 184, 92], // '#5cb85c';
+	  INFO: [91, 192, 222], // '#5bc0de',
+	  DANGER: [217, 83, 79], //'#d9534f',
+	  WARNING: [240, 173, 78] // '#f0ad4e';
+	};
+	
+	var Progress = _regularjs2['default'].extend({
+	
+	  template: tpl,
+	  // 计算属性
+	  computed: {
+	    currentColor: function currentColor(data) {
+	      var channels = mix(data.startColor, data.endColor, 100 - data.percent);
+	      return 'rgb(' + channels[0] + ',' + channels[1] + ',' + channels[2] + ')';
+	    }
+	  },
+	  config: function config(data) {
+	    // 默认属性
+	    _utilHelper2['default'].extend(data, {
+	      startColor: COLORS.INFO,
+	      endColor: COLORS.SUCCESS,
+	      inClass: 'fadeIn',
+	      outClass: 'fadeOutY',
+	      percent: 0
+	    });
+	  },
+	  // 初始化后的函数
+	  init: function init() {
+	    // 证明不是内嵌组件
+	    if (this.$root == this) this.$inject(document.body);
+	  },
+	  // 移动到某个百分比
+	  move: function move(percent) {
+	    clearTimeout(this.timer);
+	    if (percent === 100) this.end(true);else this.$update('percent', percent);
+	  },
+	  // 开始
+	  start: function start() {
+	    if (this.timer) clearTimeout(this.timer);
+	    this.data.progress = true;
+	    this.data.percent = 2;
+	    this.data.endColor = COLORS.SUCCESS;
+	    this.$update();
+	    this._startTimer();
+	  },
+	  // 结束
+	  end: function end(error) {
+	    clearTimeout(this.timer);
+	    this.data.progress = false;
+	    this.data.percent = 100;
+	    this.data.endColor = !error ? COLORS.SUCCESS : COLORS.DANGER;
+	    this.$update();
+	  },
+	  // 开始定时器
+	  _startTimer: function _startTimer() {
+	    var data = this.data;
+	    this.timer = this.$timeout(function () {
+	      data.percent = data.percent + (100 - data.percent) * (Math.random() * 0.2);
+	      this._startTimer();
+	    }, Math.random() * 300 + 500);
+	  }
+	  // 使用timeout模块
+	}).use('$timeout');
+	
+	exports['default'] = Progress;
+	module.exports = exports['default'];
+
+/***/ },
+/* 47 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = {
+	
+	  extend: function extend(o1, o2, override) {
+	    for (var i in o2) {
+	      if (o2.hasOwnProperty(i)) {
+	        if (override || typeof o1[i] === 'undefined') o1[i] = o2[i];
+	      }
+	    }return o1;
+	  },
+	
+	  obj2query: function obj2query(data) {
+	    var query = "";
+	    if (!data) return query;
+	    for (var i in data) {
+	      query += i + '=' + encodeURIComponent(data[i]) + '&';
+	    }
+	    // remove last `&`;
+	    return query.replace(/&$/, '');
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var _componentsPagerJs = __webpack_require__(49);
+	
+	var _componentsPagerJs2 = _interopRequireDefault(_componentsPagerJs);
+	
+	var _utilFetchJs = __webpack_require__(45);
+	
+	var tpl = '\n  <h2 class="sub-header">Bloging List <a  href={\'app.blog.edit\'|encode: {id: -1}} class=\'btn btn-primary\'>(Add a blog)</a></h2>\n<div class="table-responsive">\n\n<pager total={total} current={current} on-nav={this.refresh($event.page, true)}></pager>\n  <table class="table table-striped">\n    <thead>\n      <tr>\n        <th>id</th>\n        <th>author</th>\n        <th>time</th>\n        <th>title</th>\n        <th>abstract</th>\n        <th>action</th>\n      </tr>\n    </thead>\n    <tbody>\n      {#list blogs as blog}\n      <tr>\n        <td>{blog.id}</td>\n        <td>{blog.user.name}</td>\n        <td>{blog.time|format}</td>\n        <td>{blog.title}</td>\n        <td>{blog.content.slice(0,30) + "..."}</td>\n        <td>\n        <div class="btn-group" role="group" aria-label="...">\n          <a href={\'app.blog.edit\'|encode: {id: blog.id} } class="btn btn-sm btn-default">edit</a>\n          <a href={\'app.blog.detail\'|encode: {id: blog.id} } class="btn btn-sm btn-default">view</a>\n          <a href=\'#\' on-click={this.remove(blog.id, blog_index)} class="btn btn-sm btn-danger">delete</a>\n        </div>\n      </td>\n      </tr>\n      {#else}\n      <tr><td colspan=6>no blogs here</td></tr>\n      {/list}\n    </tbody>\n  </table>\n  <pager total={total} current={current} on-nav={this.refresh($event.page, true)}></pager>\n</div>\n';
+	
+	exports['default'] = _regularjs2['default'].extend({
+	
+	  template: tpl,
+	
+	  enter: function enter(option) {
+	
+	    this.update(option);
+	  },
+	  update: function update(option) {
+	
+	    this.refresh(option.param.page || 1);
+	  },
+	  // get particular page
+	  refresh: function refresh(page, redirect) {
+	    var _this = this;
+	
+	    var data = this.data;
+	
+	    if (redirect) return this.$state.go("app.blog.list", { param: { page: page } });
+	
+	    _utilFetchJs.blog.fetchList(page || 1).then(function (res) {
+	      data.blogs = res.blogs;
+	      data.total = Math.ceil(res.total / 20);
+	      data.current = page;
+	      // 异步获取的数据 ，在目前版本需要手动$update()
+	      _this.$update();
+	    })['catch'](function (err) {
+	      throw err;
+	    });
+	
+	    return false;
+	  },
+	  remove: function remove(id, index) {
+	    var _this2 = this;
+	
+	    var data = this.data;
+	
+	    _utilFetchJs.blog.remove(id).then(function () {
+	      data.blogs.splice(index, 1);
+	      _this2.$update();
+	    });
+	
+	    return false;
+	  }
+	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var tpl = '\n<ul class="pagination">\n  <li on-click={ this.nav(current-1)} class=\'pageprv {current==1? "disabled": ""}\'><a  href=\'#\' >PREV</a></li>\n  {#if total - 5 > show * 2} \n  <li  on-click={ this.nav(1)} class={current==1? \'active\': \'\'}><a href="#">1</a></li>\n  <li>{#if begin > 2}<a>...</a>{/if}</li>\n  {#list begin..end as i}\n    <li on-click={ this.nav(i)} class={current==i? \'active\': \'\'}><a href="#">{i}</a></li> \n  {/list}\n  {#if (end < total-1)}<li><a>...</a></li> {/if}\n  <li on-click={ this.nav(total)} class={current==total? \'active\': \'\'}><a href="#">{total}</a></li> \n  {#else}\n  {#list 1..total as i} \n  <li on-click={ this.nav(i)} class={current==i? \'active\': \'\'}><a href="#">{i}</a></li> \n  {/list}\n  {/if}\n  <li on-click={ this.nav(current + 1)} class=\'pagenxt {current==total? "disabled": ""}\'><a  href=\'#\' >NEXT</a></li>\n</ul>\n';
+	
+	var Pager = _regularjs2['default'].extend({
+	
+	  name: 'pager',
+	  template: tpl,
+	
+	  config: function config(data) {
+	    var count = 5;
+	    var show = data.show = Math.floor(count / 2);
+	    data.current = parseInt(data.current || 1);
+	    data.total = parseInt(data.total || 1);
+	
+	    this.$watch(['current', 'total'], function (current, total) {
+	      data.begin = current - show;
+	      data.end = current + show;
+	      if (data.begin < 2) data.begin = 2;
+	      if (data.end > data.total - 1) data.end = data.total - 1;
+	      if (current - data.begin <= 1) data.end = data.end + show + data.begin - current;
+	      if (data.end - current <= 1) data.begin = data.begin - show - current + data.end;
+	    });
+	  },
+	
+	  nav: function nav(page) {
+	    var data = this.data;
+	    if (page < 1) return false;
+	    if (page > data.total) return false;
+	    if (page === data.current) return false;
+	    var evObj = { page: page };
+	    this.$emit('nav', evObj);
+	    if (!evObj.stop) {
+	      data.current = page;
+	    }
+	    return false;
+	  }
+	});
+	
+	exports['default'] = Pager;
+	module.exports = exports['default'];
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _regularjs = __webpack_require__(8);
+	
+	var _regularjs2 = _interopRequireDefault(_regularjs);
+	
+	var _utilFetchJs = __webpack_require__(45);
+	
+	var tpl = '\n<h2>{$param.id==\'-1\'?\'Add\':\'Edit\'} Post</h2>\n<div class="row">\n  <div class="col-md-10">\n    <form>\n      <div class="form-group">\n        <label for="title">Title</label>\n        <input type="text" class="form-control" r-model={title} placeholder="Enter Title">\n      </div>\n      <div class="form-group">\n        <label for="content">Tag</label>\n        <div>\n         {#list tags as tag by tag_index}\n         <span class="label label-info">{tag} <i class=\'glyphicon glyphicon-remove\' on-click={tags.splice(tag_index, 1)}></i></span>\n         {/list}\n         <input r-model={tagContent} placeholder="Enter Tag" on-enter={this.addTag(tagContent)} >\n        </div>\n      </div>\n      <div class="form-group">\n        <label for="content">Content</label>\n        <textarea r-model={content} placeholder="Blog Content" class="form-control" rows=10 ></textarea>\n      </div>\n       <a class="btn btn-primary" on-click={this.submit( id )}>Submit</a>\n    </form>\n  </div>\n</div>\n';
+	
+	exports['default'] = _regularjs2['default'].extend({
+	
+	  template: tpl,
+	
+	  submit: function submit(id) {
+	    var _this = this;
+	
+	    var data = this.data;
+	    id = parseInt(id);
+	    var detail = {
+	      content: data.content,
+	      title: data.title,
+	      tags: data.tags
+	    };
+	
+	    if (id == "-1") {
+	      //add
+	      _utilFetchJs.blog.add(detail).then(function () {
+	        _this.$state.go("app.blog.list");
+	      });
+	    } else {
+	      _utilFetchJs.blog.update(id, detail).then(function () {
+	        _this.$state.go("app.blog.detail", { param: { id: id } });
+	      });
+	    }
+	  },
+	  enter: function enter(option) {
+	    this.update(option);
+	  },
+	
+	  update: function update(option) {
+	    var _this2 = this;
+	
+	    var data = this.data;
+	
+	    var id = data.id = option.param.id;
+	    data.title = '';
+	    data.content = '';
+	    data.tags = [];
+	    if (!id || id === '-1') return;
+	    _utilFetchJs.blog.get(id).then(function (blog) {
+	      data.title = blog.title;
+	      data.content = blog.content;
+	      data.tags = blog.tags || [];
+	      _this2.$update();
+	    });
+	  },
+	  addTag: function addTag() {
+	    var data = this.data;
+	    if (!data.tagContent) return;
+	    data.tags.push(data.tagContent);
+	    data.tagContent = '';
+	  }
+	
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	
+	// dateformat util
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var fmap = {
+	  'yyyy': function yyyy(date) {
+	    return date.getFullYear();
+	  },
+	  'MM': function MM(date) {
+	    return fix(date.getMonth() + 1);
+	  },
+	  'dd': function dd(date) {
+	    return fix(date.getDate());
+	  },
+	  'HH': function HH(date) {
+	    return fix(date.getHours());
+	  },
+	  'mm': function mm(date) {
+	    return fix(date.getMinutes());
+	  }
+	};
+	
+	var trunk = new RegExp(Object.keys(fmap).join('|'), 'g');
+	
+	function fix(str) {
+	  str = "" + (str || "");
+	  return str.length <= 1 ? "0" + str : str;
+	}
+	
+	exports['default'] = {
+	
+	  // fomat date
+	  // ------------------
+	  // example:
+	  // {1449737531544|format: 'yyyy年MM月dd日'}
+	  format: function format(value, _format) {
+	
+	    _format = _format || "yyyy-MM-dd HH:mm";
+	    if (!value) return;
+	    value = new Date(value);
+	
+	    return _format.replace(trunk, function (cap) {
+	      return fmap[cap] ? fmap[cap](value) : "";
+	    });
+	  },
+	
+	  split: {
+	    get: function get(value, split) {
+	      return value.join(split || ",");
+	    },
+	    set: function set(value, split) {
+	      return value.split(split || ",");
+	    }
+	  }
+	
+	};
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);
+//# sourceMappingURL=bundle.js.map

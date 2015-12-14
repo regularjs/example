@@ -9,8 +9,11 @@
   "author": "leeluolee",
   "license": "MIT",
   "devDependencies": {
+    "webpack": "~1.12.9",
+    "babel-loader": "^5.2.0",
     "raw-loader": "^0.5.1",
-    "rgl-loader": "^0.4.0",
-    "regularjs": "^0.4.0"
+    "regularjs": "^0.4.0",
+    "rgl-loader": "^0.4.0"
+
   }
 }
