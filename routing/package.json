@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack -w & puer -r scripts/server_route.js",
+    "start": "webpack -w & puer -r scripts/server_route.js --no-reload",
     "build": "webpack"
   },
   "author": "",
@@ -15,7 +15,7 @@
     "bootstrap": "~3.3.6",
     "puer": "leeluolee/puer#next",
     "raw-loader": "^0.5.1",
-    "regular-state": "0.0.1",
+    "regular-state": "^0.2.0",
     "regularjs": "^0.4.3",
     "webpack": "~1.12.9",
     "whatwg-fetch": "^0.10.1"

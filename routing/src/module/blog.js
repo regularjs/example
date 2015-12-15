@@ -1,9 +1,10 @@
 import Regular from 'regularjs';
 
 const tpl = `
-<h1 class="page-header">Blog</h1>
+<h1 class="page-header">Blog<i class='badge'>{total||'unkown'}</i></h1>
 <nav class="navbar navbar-default">
   <div class="container-fluid">
+    
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li  class={ this.$state.is("app.blog.list")? 'active':'' }>
@@ -15,6 +16,7 @@ const tpl = `
         <li  class={ this.$state.is("app.blog.edit")? 'active':'' }>
           <a href={'app.blog.edit'|encode: {id: -1}}>Edit</a>
         </li>
+        <li></li>
       </ul>
     </div>
     </div>
@@ -24,11 +26,17 @@ const tpl = `
 `
 
 
+
 export default Regular.extend({
 
   template: tpl,
 
   config (){
     this.$state.on("end", this.$update.bind(this,null));
-  }
+    // 监听其它模块的$notify
+    this.$on('updateTotal', function(option){
+      this.$update('total', option.param);
+    })
+  },
+
 })

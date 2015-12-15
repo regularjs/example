@@ -54,7 +54,6 @@ module.exports = {
     var id = req.params.id;
     var found = false;
     var body = req.body;
-    console.log(body, req)
     blogs.some(function(blog){
       if (blog.id === id) found = blog;
     })

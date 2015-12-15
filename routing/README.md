@@ -10,12 +10,17 @@
 
 ## 命令介绍
 
-__在`/routing`根目录下__
+__在`/routing`根目录下__ 
+
+如果npm 无法运行， 请配置为淘宝的源`https://registry.npm.taobao.org`, 或者直接使用[`cnpm`](http://cnpmjs.org/)代替`npm`
+
+
+### `npm install` : 安装所有依赖(注意第一次安装可能时间较长)
+
 
 ### `npm start`
 
 开启模拟服务器， 并且开启webpack. (启用了livereload)
-
 
 ### `npm run build`
 

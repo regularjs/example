@@ -96,7 +96,7 @@
 	
 	var dom = _regularjs2['default'].dom;
 	
-	_regularjs2['default'].filter(_utilFilterJs2['default']).directive({}).event({
+	_regularjs2['default'].filter(_utilFilterJs2['default']).event({
 	  'enter': function enter(elem, fire) {
 	    function update(ev) {
 	      if (ev.which === 13) {
@@ -183,10 +183,25 @@
 	
 	  var _ = StateMan.util;
 	
+	  // get all state match the pattern
+	  function getMatchStates(stateman, pattern) {
+	    var current = stateman;
+	    var allStates = [];
+	
+	    var currentStates = current._states;
+	
+	    for (var i in currentStates) {
+	      var state = currentStates[i];
+	      if (pattern.test(state.stateName)) allStates.push(state);
+	      if (state._states) allStates = allStates.concat(getMatchStates(state, pattern));
+	    }
+	    return allStates;
+	  }
+	
 	  var restate = function restate(option) {
 	    option = option || {};
 	    var stateman = option.stateman || new StateMan(option);
-	    var preStae = stateman.state;
+	    var preState = stateman.state;
 	    var BaseComponent = option.Component;
 	    var globalView = option.view || document.body;
 	
@@ -197,8 +212,16 @@
 	    };
 	
 	    stateman.state = function (name, Component, config) {
+	      if (typeof config === "string") {
+	        config = { url: config };
+	      }
 	
-	      if (!Component) return preStae.call(stateman, name);
+	      config = config || {};
+	
+	      // Use global option.rebuild if config.rebuild is not defined.
+	      if (config.rebuild === undefined) config.rebuild = option.rebuild;
+	
+	      if (!Component) return preState.call(stateman, name);
 	
 	      if (BaseComponent) {
 	        // 1. regular template or parsed ast
@@ -207,7 +230,7 @@
 	            template: Component
 	          });
 	        }
-	        // 2. it a Object, but need regularifi
+	        // 2. it an Object, but need regularify
 	        if (typeof Component === "object" && Component.regularify) {
 	          Component = BaseComponent.extend(Component);
 	        }
@@ -221,37 +244,120 @@
 	        }
 	        var state = {
 	          component: null,
-	          enter: function enter(step) {
-	            var data = { $param: step.param },
+	
+	          // @TODO:
+	          canUpdate: function canUpdate() {
+	
+	            var canUpdate = this.component && this.component.canUpdate;
+	
+	            if (canUpdate) return this.component.canUpdate();
+	          },
+	
+	          canLeave: function canLeave() {
+	
+	            var canLeave = this.component && this.component.canLeave;
+	
+	            if (canLeave) return this.component.canLeave();
+	          },
+	
+	          canEnter: function canEnter(option) {
+	            var data = { $param: option.param },
 	                component = this.component,
-	                noComponent = !component,
+	
+	            // if component is not exist or required to be rebuilded when entering.
+	            noComponent = !component,
 	                view;
 	
 	            if (noComponent) {
+	
 	              component = this.component = new Component({
 	                data: data,
-	                $state: stateman
+	
+	                $state: stateman,
+	
+	                $stateName: name,
+	
+	                /**
+	                 * notify other module
+	                 * @param  {String} stateName module's stateName
+	                 *         you can pass wildcard(*) for 
+	                 *       
+	                 * @param  {Whatever} param   event param
+	                 * @return {Component} this 
+	                 */
+	                $notify: function $notify(stateName, type, param) {
+	
+	                  var pattern, eventObj, state;
+	
+	                  if (!stateName) return;
+	
+	                  if (~stateName.indexOf('*')) {
+	
+	                    pattern = new RegExp(stateName.replace('.', '\\.').replace(/\*\*|\*/, function (cap) {
+	                      if (cap === '**') return '.*';else return '[^.]*';
+	                    }));
+	
+	                    getMatchStates.forEach(function (state) {
+	                      if (state.component) state.component.$emit(type, {
+	                        param: param,
+	                        from: name,
+	                        to: state.stateName
+	                      });
+	                    });
+	                  } else {
+	                    state = stateman.state(stateName);
+	                    if (!state || !state.component) return;
+	                    state.component.$emit(type, {
+	                      param: param,
+	                      from: name,
+	                      to: stateName
+	                    });
+	                  }
+	                }
 	              });
 	            }
-	            _.extend(component.data, data, true);
+	            var canEnter = this.component && this.component.canEnter;
 	
+	            if (canEnter) return this.component.canEnter();
+	          },
+	
+	          enter: function enter(option) {
+	
+	            var data = { $param: option.param };
+	            var component = this.component;
 	            var parent = this.parent,
 	                view;
+	
+	            if (!component) return;
+	
+	            _.extend(component.data, data, true);
+	
 	            if (parent.component) {
-	              var view = parent.component.$refs.view;
+	              view = parent.component.$refs.view;
 	              if (!view) throw this.parent.name + " should have a element with [ref=view]";
+	            } else {
+	              view = globalView;
 	            }
-	            component.$inject(view || globalView);
-	            var result = component.enter && component.enter(step);
-	            component.$mute(false);
-	            if (noComponent) component.$update();
+	
+	            component.$inject(view);
+	            var result = component.enter && component.enter(option);
+	
+	            component.$update(function () {
+	              component.$mute(false);
+	            });
+	
 	            return result;
 	          },
 	          leave: function leave(option) {
 	            var component = this.component;
 	            if (!component) return;
-	            component.$inject(false);
+	
 	            component.leave && component.leave(option);
+	            if (config.rebuild) {
+	              this.component = null;
+	              return component.destroy();
+	            }
+	            component.$inject(false);
 	            component.$mute(true);
 	          },
 	          update: function update(option) {
@@ -261,16 +367,14 @@
 	            component.$update({
 	              $param: option.param
 	            });
-	            component.$emit("state:update", option);
 	          }
 	        };
 	
-	        if (typeof config === "string") config = { url: config };
 	        _.extend(state, config || {});
 	
-	        preStae.call(stateman, name, state);
+	        preState.call(stateman, name, state);
 	      } else {
-	        preStae.call(stateman, name, Component);
+	        preState.call(stateman, name, Component);
 	      }
 	      return this;
 	    };
@@ -309,15 +413,17 @@
 	    stateFn = State.prototype.state;
 	
 	function StateMan(options) {
+	
 	  if (this instanceof StateMan === false) {
 	    return new StateMan(options);
 	  }
 	  options = options || {};
-	  if (options.history) this.history = options.history;
+	  // if(options.history) this.history = options.history;
+	
 	  this._states = {};
 	  this._stashCallback = [];
-	  this.current = this.active = this;
 	  this.strict = options.strict;
+	  this.current = this.active = this;
 	  this.title = options.title;
 	  this.on("end", function () {
 	    var cur = this.current,
@@ -332,11 +438,13 @@
 	}
 	
 	_.extend(_.emitable(StateMan), {
-	  // start StateMan
+	  // keep blank
+	  name: '',
 	
 	  state: function state(stateName, config) {
+	
 	    var active = this.active;
-	    if (typeof stateName === "string" && active.name) {
+	    if (typeof stateName === "string" && active) {
 	      stateName = stateName.replace("~", active.name);
 	      if (active.parent) stateName = stateName.replace("^", active.parent.name || "");
 	    }
@@ -346,6 +454,7 @@
 	    return stateFn.apply(this, arguments);
 	  },
 	  start: function start(options) {
+	
 	    if (!this.history) this.history = new Histery(options);
 	    if (!this.history.isStart) {
 	      this.history.on("change", _.bind(this._afterPathChange, this));
@@ -356,13 +465,12 @@
 	  stop: function stop() {
 	    this.history.stop();
 	  },
-	  async: function async() {
-	    return this.active && this.active.async();
-	  },
 	  // @TODO direct go the point state
 	  go: function go(state, option, callback) {
 	    option = option || {};
 	    if (typeof state === "string") state = this.state(state);
+	
+	    if (!state) return;
 	
 	    if (typeof option === "function") {
 	      callback = option;
@@ -371,10 +479,12 @@
 	
 	    if (option.encode !== false) {
 	      var url = state.encode(option.param);
+	      option.path = url;
 	      this.nav(url, { silent: true, replace: option.replace });
-	      this.path = url;
 	    }
+	
 	    this._go(state, option, callback);
+	
 	    return this;
 	  },
 	  nav: function nav(url, options, callback) {
@@ -383,14 +493,16 @@
 	      options = {};
 	    }
 	    options = options || {};
-	    // callback && (this._cb = callback)
+	
+	    options.path = url;
 	
 	    this.history.nav(url, _.extend({ silent: true }, options));
 	    if (!options.silent) this._afterPathChange(_.cleanPath(url), options, callback);
-	    // this._cb = null;
+	
 	    return this;
 	  },
 	  decode: function decode(path) {
+	
 	    var pathAndQuery = path.split("?");
 	    var query = this._findQuery(pathAndQuery[1]);
 	    path = pathAndQuery[0];
@@ -399,7 +511,8 @@
 	    return state;
 	  },
 	  encode: function encode(stateName, param) {
-	    return this.state(stateName).encode(param);
+	    var state = this.state(stateName);
+	    return state ? state.encode(param) : '';
 	  },
 	  // notify specify state
 	  // check the active statename whether to match the passed condition (stateName and param)
@@ -419,13 +532,12 @@
 	
 	    var found = this.decode(path);
 	
-	    this.path = path;
-	
 	    options = options || {};
+	
+	    options.path = path;
 	
 	    if (!found) {
 	      // loc.nav("$default", {silent: true})
-	      options.path = path;
 	      return this._notfound(options);
 	    }
 	
@@ -434,84 +546,248 @@
 	    this._go(found, options, callback);
 	  },
 	  _notfound: function _notfound(options) {
-	    var $notfound = this.state("$notfound");
-	    if ($notfound) this._go($notfound, options);
+	
+	    // var $notfound = this.state("$notfound");
+	
+	    // if( $notfound ) this._go($notfound, options);
 	
 	    return this.emit("notfound", options);
 	  },
 	  // goto the state with some option
 	  _go: function _go(state, option, callback) {
+	
 	    var over;
 	
-	    if (typeof state === "string") state = this.state(state);
+	    // if(typeof state === "string") state = this.state(state);
 	
-	    if (!state) return _.log("destination is not defined");
+	    // if(!state) return _.log("destination is not defined")
+	
 	    if (state.hasNext && this.strict) return this._notfound({ name: state.name });
 	
 	    // not touch the end in previous transtion
 	
-	    if (this.active !== this.current) {
-	      // we need return
-	
-	      _.log("naving to [" + this.current.name + "] will be stoped, trying to [" + state.name + "] now");
-	      if (this.active.done) {
-	        this.active.done(false);
-	      }
-	      this.current = this.active;
-	      // back to before
-	    }
+	    // if( this.pending ){
+	    //   var pendingCurrent = this.pending.current;
+	    //   this.pending.stop();
+	    //   _.log("naving to [" + pendingCurrent.name + "] will be stoped, trying to ["+state.name+"] now");
+	    // }
+	    // if(this.active !== this.current){
+	    //   // we need return
+	    //   _.log("naving to [" + this.current.name + "] will be stoped, trying to ["+state.name+"] now");
+	    //   this.current = this.active;
+	    //   // back to before
+	    // }
 	    option.param = option.param || {};
-	    this.param = option.param;
 	
 	    var current = this.current,
 	        baseState = this._findBase(current, state),
+	        prepath = this.path,
 	        self = this;
 	
 	    if (typeof callback === "function") this._stashCallback.push(callback);
 	    // if we done the navigating when start
-	    var done = function done(success) {
+	    function done(success) {
 	      over = true;
-	      self.current = self.active;
 	      if (success !== false) self.emit("end");
-	      self._popStash();
-	    };
+	      self.pending = null;
+	      self._popStash(option);
+	    }
+	
+	    option.previous = current;
+	    option.current = state;
 	
 	    if (current !== state) {
-	      self.emit("begin", {
-	        previous: current,
-	        current: state,
-	        param: option.param,
-	        stop: function stop() {
-	          done(false);
+	      option.stop = function () {
+	        done(false);
+	        self.nav(prepath ? prepath : "/", { silent: true });
+	      };
+	      self.emit("begin", option);
+	    }
+	    // if we stop it in 'begin' listener
+	    if (over === true) return;
+	
+	    if (current !== state) {
+	      // option as transition object.
+	
+	      option.phase = 'permission';
+	      this._walk(current, state, option, true, _.bind(function (notRejected) {
+	
+	        if (notRejected === false) {
+	          // if reject in callForPermission, we will return to old
+	          prepath && this.nav(prepath, { silent: true });
+	
+	          done(false, 2);
+	
+	          return this.emit('abort', option);
 	        }
-	      });
-	      if (over === true) {
-	        return current !== this && this.nav(current.encode(current.param), { silent: true });
-	      }
-	      this.previous = current;
-	      this.current = state;
-	      this._leave(baseState, option, function (success) {
-	        self._checkQueryAndParam(baseState, option);
-	        if (success === false) return done(success);
-	        self._enter(state, option, done);
-	      });
+	
+	        // stop previous pending.
+	        if (this.pending) this.pending.stop();
+	        this.pending = option;
+	        this.path = option.path;
+	        this.current = option.current;
+	        this.param = option.param;
+	        this.previous = option.previous;
+	        option.phase = 'navigation';
+	        this._walk(current, state, option, false, _.bind(function (notRejected) {
+	
+	          if (notRejected === false) {
+	            this.current = this.active;
+	            done(false);
+	            return this.emit('abort', option);
+	          }
+	
+	          this.active = option.current;
+	
+	          option.phase = 'completion';
+	          return done();
+	        }, this));
+	      }, this));
 	    } else {
 	      self._checkQueryAndParam(baseState, option);
+	      this.pending = null;
 	      done();
 	    }
 	  },
-	  _popStash: function _popStash() {
+	  _popStash: function _popStash(option) {
+	
 	    var stash = this._stashCallback,
 	        len = stash.length;
+	
 	    this._stashCallback = [];
+	
 	    if (!len) return;
 	
 	    for (var i = 0; i < len; i++) {
-	      stash[i].call(this);
+	      stash[i].call(this, option);
 	    }
 	  },
 	
+	  // the transition logic  Used in Both canLeave canEnter && leave enter LifeCycle
+	
+	  _walk: function _walk(from, to, option, callForPermit, callback) {
+	
+	    // nothing -> app.state
+	    var parent = this._findBase(from, to);
+	
+	    option.basckward = true;
+	    this._transit(from, parent, option, callForPermit, _.bind(function (notRejected) {
+	
+	      if (notRejected === false) return callback(notRejected);
+	
+	      // only actual transiton need update base state;
+	      if (!callForPermit) this._checkQueryAndParam(parent, option);
+	
+	      option.basckward = false;
+	      this._transit(parent, to, option, callForPermit, callback);
+	    }, this));
+	  },
+	
+	  _transit: function _transit(from, to, option, callForPermit, callback) {
+	    //  touch the ending
+	    if (from === to) return callback();
+	
+	    var back = from.name.length > to.name.length;
+	    var method = back ? 'leave' : 'enter';
+	    var applied;
+	
+	    // use canEnter to detect permission
+	    if (callForPermit) method = 'can' + method.replace(/^\w/, function (a) {
+	      return a.toUpperCase();
+	    });
+	
+	    var loop = _.bind(function (notRejected) {
+	
+	      // stop transition or touch the end
+	      if (applied === to || notRejected === false) return callback(notRejected);
+	
+	      if (!applied) {
+	
+	        applied = back ? from : this._computeNext(from, to);
+	      } else {
+	
+	        applied = this._computeNext(applied, to);
+	      }
+	
+	      if (back && applied === to || !applied) return callback(notRejected);
+	
+	      this._moveOn(applied, method, option, loop);
+	    }, this);
+	
+	    loop();
+	  },
+	
+	  _moveOn: function _moveOn(applied, method, option, callback) {
+	
+	    var isDone = false;
+	    var isPending = false;
+	
+	    option.async = function () {
+	
+	      isPending = true;
+	
+	      return done;
+	    };
+	
+	    function done(notRejected) {
+	      if (isDone) return;
+	      isPending = false;
+	      isDone = true;
+	      callback(notRejected);
+	    }
+	
+	    option.stop = function () {
+	      done(false);
+	    };
+	
+	    this.active = applied;
+	    var retValue = applied[method] ? applied[method](option) : true;
+	
+	    if (method === 'enter') applied.visited = true;
+	    // promise
+	    // need breadk , if we call option.stop first;
+	
+	    if (_.isPromise(retValue)) {
+	
+	      return this._wrapPromise(retValue, done);
+	    }
+	
+	    // if haven't call option.async yet
+	    if (!isPending) done(retValue);
+	  },
+	
+	  _wrapPromise: function _wrapPromise(promise, next) {
+	
+	    return promise.then(next, function () {
+	      next(false);
+	    });
+	  },
+	
+	  _computeNext: function _computeNext(from, to) {
+	
+	    var fname = from.name;
+	    var tname = to.name;
+	
+	    var tsplit = tname.split('.');
+	    var fsplit = fname.split('.');
+	
+	    var tlen = tsplit.length;
+	    var flen = fsplit.length;
+	
+	    if (fname === '') flen = 0;
+	    if (tname === '') tlen = 0;
+	
+	    if (flen < tlen) {
+	      fsplit[flen] = tsplit[flen];
+	    } else {
+	      fsplit.pop();
+	    }
+	
+	    return this.state(fsplit.join('.'));
+	  },
+	
 	  _findQuery: function _findQuery(querystr) {
+	
 	    var queries = querystr && querystr.split("&"),
 	        query = {};
 	    if (queries) {
@@ -548,6 +824,7 @@
 	  },
 	  // find the same branch;
 	  _findBase: function _findBase(now, before) {
+	
 	    if (!now || !before || now == this || before == this) return this;
 	    var np = now,
 	        bp = before,
@@ -560,72 +837,10 @@
 	      }
 	      np = np.parent;
 	    }
-	    return this;
-	  },
-	  _enter: function _enter(end, options, callback) {
-	
-	    callback = callback || _.noop;
-	
-	    var active = this.active;
-	
-	    if (active == end) return callback();
-	    var stage = [];
-	    while (end !== active && end) {
-	      stage.push(end);
-	      end = end.parent;
-	    }
-	    this._enterOne(stage, options, callback);
-	  },
-	  _enterOne: function _enterOne(stage, options, callback) {
-	
-	    var cur = stage.pop(),
-	        self = this;
-	    if (!cur) return callback();
-	
-	    this.active = cur;
-	
-	    cur.done = function (success) {
-	      cur._pending = false;
-	      cur.done = null;
-	      cur.visited = true;
-	      if (success !== false) {
-	        self._enterOne(stage, options, callback);
-	      } else {
-	        return callback(success);
-	      }
-	    };
-	
-	    if (!cur.enter) cur.done();else {
-	      var success = cur.enter(options);
-	      if (!cur._pending && cur.done) cur.done(success);
-	    }
-	  },
-	  _leave: function _leave(end, options, callback) {
-	    callback = callback || _.noop;
-	    if (end == this.active) return callback();
-	    this._leaveOne(end, options, callback);
-	  },
-	  _leaveOne: function _leaveOne(end, options, callback) {
-	    if (end === this.active) return callback();
-	    var cur = this.active,
-	        self = this;
-	    cur.done = function (success) {
-	      cur._pending = false;
-	      cur.done = null;
-	      if (success !== false) {
-	        if (cur.parent) self.active = cur.parent;
-	        self._leaveOne(end, options, callback);
-	      } else {
-	        return callback(success);
-	      }
-	    };
-	    if (!cur.leave) cur.done();else {
-	      var success = cur.leave(options);
-	      if (!cur._pending && cur.done) cur.done(success);
-	    }
 	  },
 	  // check the query and Param
 	  _checkQueryAndParam: function _checkQueryAndParam(baseState, options) {
+	
 	    var from = baseState;
 	    while (from !== this) {
 	      from.update && from.update(options);
@@ -705,7 +920,7 @@
 	  },
 	
 	  config: function config(configure) {
-	    if (!configure) return;
+	
 	    configure = this._getConfig(configure);
 	
 	    for (var i in configure) {
@@ -790,10 +1005,10 @@
 	      return false;
 	    }
 	  },
+	  // by default, all lifecycle is permitted
+	
 	  async: function async() {
-	    var self = this;
-	    this._pending = true;
-	    return this.done;
+	    throw new Error('please use option.async instead');
 	  }
 	
 	});
@@ -816,13 +1031,6 @@
 	    o1[i] = o2[i];
 	  }
 	  return o1;
-	};
-	
-	// Object.create shim
-	_.ocreate = Object.create || function (o) {
-	  var Foo = function Foo() {};
-	  Foo.prototype = o;
-	  return new Foo();
 	};
 	
 	_.slice = function (arr, index) {
@@ -851,6 +1059,10 @@
 	
 	// small emitter
 	_.emitable = (function () {
+	  function norm(ev) {
+	    var eventAndNamespace = (ev || '').split(':');
+	    return { event: eventAndNamespace[0], namespace: eventAndNamespace[1] };
+	  }
 	  var API = {
 	    once: function once(event, fn) {
 	      var callback = function callback() {
@@ -864,42 +1076,50 @@
 	        for (var i in event) {
 	          this.on(i, event[i]);
 	        }
-	      } else {
+	        return this;
+	      }
+	      var ne = norm(event);
+	      event = ne.event;
+	      if (event && typeof fn === 'function') {
 	        var handles = this._handles || (this._handles = {}),
 	            calls = handles[event] || (handles[event] = []);
+	        fn._ns = ne.namespace;
 	        calls.push(fn);
 	      }
 	      return this;
 	    },
 	    off: function off(event, fn) {
+	      var ne = norm(event);event = ne.event;
 	      if (!event || !this._handles) this._handles = {};
-	      if (!this._handles) return;
 	
 	      var handles = this._handles,
 	          calls;
 	
 	      if (calls = handles[event]) {
-	        if (!fn) {
+	        if (!fn && !ne.namespace) {
 	          handles[event] = [];
-	          return this;
-	        }
-	        for (var i = 0, len = calls.length; i < len; i++) {
-	          if (fn === calls[i]) {
-	            calls.splice(i, 1);
-	            return this;
+	        } else {
+	          for (var i = 0, len = calls.length; i < len; i++) {
+	            if ((!fn || fn === calls[i]) && (!ne.namespace || calls[i]._ns === ne.namespace)) {
+	              calls.splice(i, 1);
+	              return this;
+	            }
 	          }
 	        }
 	      }
 	      return this;
 	    },
 	    emit: function emit(event) {
+	      var ne = norm(event);event = ne.event;
+	
 	      var args = _.slice(arguments, 1),
 	          handles = this._handles,
 	          calls;
 	
 	      if (!handles || !(calls = handles[event])) return this;
 	      for (var i = 0, len = calls.length; i < len; i++) {
-	        calls[i].apply(this, args);
+	        var fn = calls[i];
+	        if (!ne.namespace || fn._ns === ne.namespace) fn.apply(this, args);
 	      }
 	      return this;
 	    }
@@ -909,8 +1129,6 @@
 	    return _.extend(obj, API);
 	  };
 	})();
-	
-	_.noop = function () {};
 	
 	_.bind = function (fn, context) {
 	  return function () {
@@ -971,6 +1189,11 @@
 	
 	_.log = function (msg, type) {
 	  typeof console !== "undefined" && console[type || "log"](msg);
+	};
+	
+	_.isPromise = function (obj) {
+	
+	  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 	};
 	
 	_.normalize = normalizePath;
@@ -1127,6 +1350,7 @@
 	    var prefix = this.prefix,
 	        self = this;
 	    browser.on(document.body, "click", function (ev) {
+	
 	      var target = ev.target || ev.srcElement;
 	      if (target.tagName.toLowerCase() !== "a") return;
 	      var tmp = (browser.getHref(target) || "").match(self.rPrefix);
@@ -7156,29 +7380,34 @@
 /* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _regularjs = __webpack_require__(8);
 	
 	var _regularjs2 = _interopRequireDefault(_regularjs);
 	
-	var tpl = "\n<h1 class=\"page-header\">Blog</h1>\n<nav class=\"navbar navbar-default\">\n  <div class=\"container-fluid\">\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav\">\n        <li  class={ this.$state.is(\"app.blog.list\")? 'active':'' }>\n          <a href={'app.blog.list'|encode}>List</a>\n        </li>\n        <li  class={ this.$state.is(\"app.blog.detail\")? 'active':'' }>\n          <a href=\"javascript:;\">Detail</a>\n        </li>\n        <li  class={ this.$state.is(\"app.blog.edit\")? 'active':'' }>\n          <a href={'app.blog.edit'|encode: {id: -1}}>Edit</a>\n        </li>\n      </ul>\n    </div>\n    </div>\n</nav>\n<menu state={$state} menu={menus} ></menu>\n<div class=\"col-sm-12\" ref=view></div>\n";
+	var tpl = '\n<h1 class="page-header">Blog<i class=\'badge\'>{total||\'unkown\'}</i></h1>\n<nav class="navbar navbar-default">\n  <div class="container-fluid">\n    \n    <div id="navbar" class="navbar-collapse collapse">\n      <ul class="nav navbar-nav">\n        <li  class={ this.$state.is("app.blog.list")? \'active\':\'\' }>\n          <a href={\'app.blog.list\'|encode}>List</a>\n        </li>\n        <li  class={ this.$state.is("app.blog.detail")? \'active\':\'\' }>\n          <a href="javascript:;">Detail</a>\n        </li>\n        <li  class={ this.$state.is("app.blog.edit")? \'active\':\'\' }>\n          <a href={\'app.blog.edit\'|encode: {id: -1}}>Edit</a>\n        </li>\n        <li></li>\n      </ul>\n    </div>\n    </div>\n</nav>\n<menu state={$state} menu={menus} ></menu>\n<div class="col-sm-12" ref=view></div>\n';
 	
-	exports["default"] = _regularjs2["default"].extend({
+	exports['default'] = _regularjs2['default'].extend({
 	
 	  template: tpl,
 	
 	  config: function config() {
 	    this.$state.on("end", this.$update.bind(this, null));
+	    // 监听其它模块的$notify
+	    this.$on('updateTotal', function (option) {
+	      this.$update('total', option.param);
+	    });
 	  }
+	
 	});
-	module.exports = exports["default"];
+	module.exports = exports['default'];
 
 /***/ },
 /* 41 */
@@ -7603,7 +7832,7 @@
 	  },
 	  update: function update(option) {
 	
-	    this.refresh(option.param.page || 1);
+	    this.refresh(parseInt(option.param.page) || 1);
 	  },
 	  // get particular page
 	  refresh: function refresh(page, redirect) {
@@ -7618,6 +7847,7 @@
 	      data.total = Math.ceil(res.total / 20);
 	      data.current = page;
 	      // 异步获取的数据 ，在目前版本需要手动$update()
+	      _this.$notify('app.blog', 'updateTotal', res.total);
 	      _this.$update();
 	    })['catch'](function (err) {
 	      throw err;
@@ -7715,7 +7945,7 @@
 	
 	var _utilFetchJs = __webpack_require__(45);
 	
-	var tpl = '\n<h2>{$param.id==\'-1\'?\'Add\':\'Edit\'} Post</h2>\n<div class="row">\n  <div class="col-md-10">\n    <form>\n      <div class="form-group">\n        <label for="title">Title</label>\n        <input type="text" class="form-control" r-model={title} placeholder="Enter Title">\n      </div>\n      <div class="form-group">\n        <label for="content">Tag</label>\n        <div>\n         {#list tags as tag by tag_index}\n         <span class="label label-info">{tag} <i class=\'glyphicon glyphicon-remove\' on-click={tags.splice(tag_index, 1)}></i></span>\n         {/list}\n         <input r-model={tagContent} placeholder="Enter Tag" on-enter={this.addTag(tagContent)} >\n        </div>\n      </div>\n      <div class="form-group">\n        <label for="content">Content</label>\n        <textarea r-model={content} placeholder="Blog Content" class="form-control" rows=10 ></textarea>\n      </div>\n       <a class="btn btn-primary" on-click={this.submit( id )}>Submit</a>\n    </form>\n  </div>\n</div>\n';
+	var tpl = '\ndjalsdjlasdjal\n<h2>{$param.id==\'-1\'?\'Add\':\'Edit\'} Post</h2>\n<div class="row">\n  <div class="col-md-10">\n    <form>\n      <div class="form-group">\n        <label for="title">Title</label>\n        <input type="text" class="form-control" r-model={title} placeholder="Enter Title">\n      </div>\n      <div class="form-group">\n        <label for="content">Tag</label>\n        <div>\n         {#list tags as tag by tag_index}\n         <span class="label label-info">{tag} <i class=\'glyphicon glyphicon-remove\' on-click={tags.splice(tag_index, 1)}></i></span>\n         {/list}\n         <input r-model={tagContent} placeholder="Enter Tag" on-enter={this.addTag(tagContent)} >\n        </div>\n      </div>\n      <div class="form-group">\n        <label for="content">Content</label>\n        <textarea r-model={content} placeholder="Blog Content" class="form-control" rows=10 ></textarea>\n      </div>\n       <a class="btn btn-primary" on-click={this.submit( id )}>Submit</a>\n    </form>\n  </div>\n</div>\n';
 	
 	exports['default'] = _regularjs2['default'].extend({
 	

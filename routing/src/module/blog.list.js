@@ -53,7 +53,7 @@ export default Regular.extend({
   },
   update( option ){
 
-    this.refresh(option.param.page || 1);
+    this.refresh(parseInt(option.param.page) || 1);
 
   },
   // get particular page
@@ -68,6 +68,7 @@ export default Regular.extend({
       data.total = Math.ceil(res.total / 20);
       data.current = page;
       // 异步获取的数据 ，在目前版本需要手动$update()
+      this.$notify('app.blog', 'updateTotal', res.total)
       this.$update();
     }
     ).catch((err) =>{

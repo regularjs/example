@@ -19,7 +19,6 @@ let dom = Regular.dom;
 
 Regular
   .filter( filters )
-  .directive( {  } )
   .event({
     'enter': function(elem, fire){
       function update( ev ) {

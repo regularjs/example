@@ -2,6 +2,7 @@ import Regular from 'regularjs';
 import {blog} from '../util/fetch.js';
 
 const tpl = `
+djalsdjlasdjal
 <h2>{$param.id=='-1'?'Add':'Edit'} Post</h2>
 <div class="row">
   <div class="col-md-10">
@@ -28,7 +29,6 @@ const tpl = `
   </div>
 </div>
 `;
-
 
 
 
