@@ -45,7 +45,7 @@ npm start    # will open the browser
 - puer:  前端开发服务器 ： 静态 + mock接口等
 
 
-### 命令介绍
+## 命令介绍
 
 __在`/routing`根目录下__ 
 
@@ -58,6 +58,18 @@ __在`/routing`根目录下__
 ### `npm start`
 
 开启模拟服务器， 并且开启webpack. 
+
+
+### 几个关键文件
+
+- server_route.js : 是一个server端的路由配置， 所有数据都是伪造的， 你可以以类似的方式添加自己的接口， 修改后无需重启自动生效.
+- webpack.config.js:  webpack的打包配置.  webpack命令会默认查找当前目录下的此文件.
+- index.html:  入口文件， 我们将所有的page路由都指向了这个文件，使得前端可以完全接管路由部分.
+- src/index.js:  前端的入口文件，主要是处理前端路由的配置
+- src/components: 放置一些独立的组件
+- src/module: 放置作为单页模块的组件
+- src/util: 一些帮助函数.
+
 
 
 
