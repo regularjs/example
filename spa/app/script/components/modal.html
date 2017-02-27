@@ -1,0 +1,27 @@
+
+<div class="modal fade show" tabindex="-1" 
+  r-anim='on:enter; wait: 200;class: in, 3; on: leave; class: in, 4'  role="dialog" ref=modal>
+  <div class="modal-dialog">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        {#if !noClose}
+        <button class="close" aria-label="Close" on-click={this.confirm(false)}>
+          <span aria-hidden="true">×</span>
+        </button>
+        {/if}
+        <h4 class="modal-title">{#inc title || '弹窗'}</h4>
+      </div>
+      <div class="modal-body">
+        {#inc  body || this.$body }
+      </div>
+      <div class="modal-footer">
+        {#if foot} 
+          {#inc foot } 
+        {#else}
+          <button type="button" class="btn btn-primary" on-click={ this.confirm(true) }>{confirmText||'确认'}</button>
+          <button type="button" class="btn btn-default" on-click={ this.confirm(false) }>{cancelText||'取消'}</button>
+        {/if}
+      </div>
+    </div>
+  </div>
+</div>
